@@ -1,65 +1,226 @@
-import Image from "next/image";
+import Link from "next/link";
+import { TreeDeciduous, Calculator, Mail, Shield, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="min-h-screen">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-forest-50 to-cream">
+        {/* Background decoration */}
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute top-20 left-10 w-64 h-64 bg-forest-200 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-earth-200 rounded-full blur-3xl" />
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="relative max-w-6xl mx-auto px-6 py-24 md:py-32">
+          <div className="text-center max-w-3xl mx-auto">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-forest-100 text-forest-800 rounded-full text-sm font-medium mb-8">
+              <TreeDeciduous className="w-4 h-4" />
+              Free Tree Valuation Calculator
+            </div>
+
+            {/* Headline */}
+            <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-charcoal-900 leading-tight mb-6">
+              Discover What Your Trees Are{" "}
+              <span className="text-forest-700">Really Worth</span>
+            </h1>
+
+            {/* Subheadline */}
+            <p className="text-lg md:text-xl text-charcoal-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+              Get a professional-grade valuation of your tree&apos;s replacement cost
+              and annual ecosystem benefits. Takes less than 2 minutes.
+            </p>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/calculator">
+                <Button size="lg" rightIcon={<ArrowRight className="w-5 h-5" />}>
+                  Calculate My Tree&apos;s Value
+                </Button>
+              </Link>
+              <Button variant="secondary" size="lg">
+                Learn How It Works
+              </Button>
+            </div>
+
+            {/* Trust indicators */}
+            <p className="mt-8 text-sm text-charcoal-500">
+              Based on CTLA appraisal methods used by certified arborists
+            </p>
+          </div>
         </div>
-      </main>
+      </section>
+
+      {/* Value Props Section */}
+      <section className="py-20 md:py-28 bg-white">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="font-heading text-3xl md:text-4xl font-semibold text-charcoal-900 mb-4">
+              Your Tree is a Valuable Asset
+            </h2>
+            <p className="text-lg text-charcoal-600 max-w-2xl mx-auto">
+              Most homeowners don&apos;t realize that a mature tree can be worth
+              thousands of dollars. Our calculator reveals both the replacement
+              value and the ongoing benefits.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Card 1 */}
+            <div className="bg-cream rounded-2xl p-8 border border-charcoal-100">
+              <div className="w-14 h-14 bg-forest-100 rounded-xl flex items-center justify-center mb-6">
+                <Calculator className="w-7 h-7 text-forest-700" />
+              </div>
+              <h3 className="font-heading text-xl font-semibold text-charcoal-900 mb-3">
+                Replacement Value
+              </h3>
+              <p className="text-charcoal-600 leading-relaxed">
+                Discover what it would cost to replace your tree today using
+                industry-standard CTLA appraisal methods.
+              </p>
+              <p className="mt-4 text-2xl font-mono font-bold text-forest-700">
+                $5,000 - $50,000+
+              </p>
+            </div>
+
+            {/* Card 2 */}
+            <div className="bg-cream rounded-2xl p-8 border border-charcoal-100">
+              <div className="w-14 h-14 bg-earth-100 rounded-xl flex items-center justify-center mb-6">
+                <TreeDeciduous className="w-7 h-7 text-earth-600" />
+              </div>
+              <h3 className="font-heading text-xl font-semibold text-charcoal-900 mb-3">
+                Annual Eco-Dividend
+              </h3>
+              <p className="text-charcoal-600 leading-relaxed">
+                Your tree provides free services every year: carbon capture,
+                stormwater management, and energy savings.
+              </p>
+              <p className="mt-4 text-2xl font-mono font-bold text-earth-600">
+                $50 - $200/year
+              </p>
+            </div>
+
+            {/* Card 3 */}
+            <div className="bg-cream rounded-2xl p-8 border border-charcoal-100">
+              <div className="w-14 h-14 bg-forest-100 rounded-xl flex items-center justify-center mb-6">
+                <Mail className="w-7 h-7 text-forest-700" />
+              </div>
+              <h3 className="font-heading text-xl font-semibold text-charcoal-900 mb-3">
+                Detailed Report
+              </h3>
+              <p className="text-charcoal-600 leading-relaxed">
+                Receive a comprehensive Tree Wealth Report with your complete
+                valuation breakdown via email.
+              </p>
+              <p className="mt-4 text-2xl font-mono font-bold text-forest-700">
+                100% Free
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="py-20 md:py-28 bg-forest-50">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="font-heading text-3xl md:text-4xl font-semibold text-charcoal-900 mb-4">
+              How It Works
+            </h2>
+            <p className="text-lg text-charcoal-600">
+              Three simple steps to discover your tree&apos;s value
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                step: "1",
+                title: "Describe Your Tree",
+                description:
+                  "Answer a few simple questions about your tree's size and type. No measuring tools needed.",
+              },
+              {
+                step: "2",
+                title: "Get Your Valuation",
+                description:
+                  "Our algorithm calculates your tree's replacement value and annual benefits instantly.",
+              },
+              {
+                step: "3",
+                title: "Receive Your Report",
+                description:
+                  "Get a detailed Tree Wealth Report delivered to your inbox with expert recommendations.",
+              },
+            ].map((item) => (
+              <div key={item.step} className="text-center">
+                <div className="w-16 h-16 bg-forest-700 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
+                  {item.step}
+                </div>
+                <h3 className="font-heading text-xl font-semibold text-charcoal-900 mb-3">
+                  {item.title}
+                </h3>
+                <p className="text-charcoal-600">{item.description}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <Link href="/calculator">
+              <Button size="lg" rightIcon={<ArrowRight className="w-5 h-5" />}>
+                Start Free Valuation
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Trust Section */}
+      <section className="py-16 bg-white border-t border-charcoal-100">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-8 text-center md:text-left">
+            <div className="flex items-center gap-3">
+              <Shield className="w-6 h-6 text-forest-600" />
+              <span className="text-charcoal-600">
+                Based on CTLA standards
+              </span>
+            </div>
+            <div className="hidden md:block w-px h-6 bg-charcoal-200" />
+            <div className="flex items-center gap-3">
+              <TreeDeciduous className="w-6 h-6 text-forest-600" />
+              <span className="text-charcoal-600">
+                i-Tree ecosystem formulas
+              </span>
+            </div>
+            <div className="hidden md:block w-px h-6 bg-charcoal-200" />
+            <div className="flex items-center gap-3">
+              <Mail className="w-6 h-6 text-forest-600" />
+              <span className="text-charcoal-600">
+                No spam, ever
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-12 bg-charcoal-900 text-charcoal-300">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-2">
+              <TreeDeciduous className="w-6 h-6 text-forest-400" />
+              <span className="font-heading text-xl font-semibold text-white">
+                TreeValue Pro
+              </span>
+            </div>
+            <p className="text-sm">
+              &copy; {new Date().getFullYear()} TreeValue Pro. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
