@@ -10,10 +10,15 @@ import {
 } from "react";
 import type {
   WizardData,
+  TreeData,
   SpeciesCategory,
   HeightHeuristic,
   GirthHeuristic,
   LocationType,
+  HealthCondition,
+  PhotoUpload,
+  KindwiseIdentification,
+  KindwiseHealthAssessment,
 } from "@/types";
 import { WIZARD_STEPS } from "@/lib/constants";
 
@@ -25,7 +30,8 @@ interface WizardState {
   currentStep: number;
   data: WizardData;
   isComplete: boolean;
-  errors: Partial<Record<keyof WizardData, string>>;
+  isIdentifying: boolean;
+  errors: Record<string, string>;
 }
 
 type WizardAction =
@@ -33,28 +39,55 @@ type WizardAction =
   | { type: "SET_HEIGHT"; payload: HeightHeuristic }
   | { type: "SET_GIRTH"; payload: GirthHeuristic }
   | { type: "SET_LOCATION"; payload: LocationType }
+  | { type: "SET_HEALTH_CONDITION"; payload: HealthCondition }
   | { type: "SET_EMAIL"; payload: string }
   | { type: "SET_ZIP_CODE"; payload: string }
+  | { type: "SET_IDENTIFICATION_PHOTOS"; payload: PhotoUpload[] }
+  | { type: "SET_HEALTH_PHOTOS"; payload: PhotoUpload[] }
+  | { type: "SET_IDENTIFICATION_RESULT"; payload: KindwiseIdentification }
+  | { type: "SET_HEALTH_ASSESSMENT"; payload: KindwiseHealthAssessment }
+  | { type: "SET_CUSTOM_SPECIES"; payload: string }
+  | { type: "SET_IDENTIFYING"; payload: boolean }
+  | { type: "ADD_TREE" }
+  | { type: "REMOVE_TREE"; payload: number }
+  | { type: "SELECT_TREE"; payload: number }
+  | { type: "SET_TREE_NICKNAME"; payload: string }
   | { type: "NEXT_STEP" }
   | { type: "PREV_STEP" }
   | { type: "GO_TO_STEP"; payload: number }
-  | { type: "SET_ERROR"; payload: { field: keyof WizardData; message: string } }
-  | { type: "CLEAR_ERROR"; payload: keyof WizardData }
+  | { type: "SET_ERROR"; payload: { field: string; message: string } }
+  | { type: "CLEAR_ERROR"; payload: string }
   | { type: "RESET" };
 
 interface WizardContextValue extends WizardState {
-  // Actions
+  // Tree actions
+  currentTree: TreeData;
   setSpecies: (species: SpeciesCategory) => void;
   setHeight: (height: HeightHeuristic) => void;
   setGirth: (girth: GirthHeuristic) => void;
   setLocation: (location: LocationType) => void;
+  setHealthCondition: (condition: HealthCondition) => void;
+  setIdentificationPhotos: (photos: PhotoUpload[]) => void;
+  setHealthPhotos: (photos: PhotoUpload[]) => void;
+  setIdentificationResult: (result: KindwiseIdentification) => void;
+  setHealthAssessment: (assessment: KindwiseHealthAssessment) => void;
+  setCustomSpecies: (species: string) => void;
+  setTreeNickname: (nickname: string) => void;
+  setIdentifying: (isIdentifying: boolean) => void;
+
+  // Multi-tree actions
+  addTree: () => void;
+  removeTree: (index: number) => void;
+  selectTree: (index: number) => void;
+
+  // Global actions
   setEmail: (email: string) => void;
   setZipCode: (zipCode: string) => void;
   nextStep: () => void;
   prevStep: () => void;
   goToStep: (step: number) => void;
-  setError: (field: keyof WizardData, message: string) => void;
-  clearError: (field: keyof WizardData) => void;
+  setError: (field: string, message: string) => void;
+  clearError: (field: string) => void;
   reset: () => void;
 
   // Computed
@@ -63,6 +96,24 @@ interface WizardContextValue extends WizardState {
   totalSteps: number;
   currentStepConfig: (typeof WIZARD_STEPS)[number];
   progress: number;
+  treeCount: number;
+}
+
+// ========================================
+// Helpers
+// ========================================
+
+function createEmptyTree(): TreeData {
+  return {
+    id: `tree_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+    species: null,
+    height: null,
+    girth: null,
+    location: null,
+    healthCondition: null,
+    identificationPhotos: [],
+    healthPhotos: [],
+  };
 }
 
 // ========================================
@@ -72,19 +123,18 @@ interface WizardContextValue extends WizardState {
 const initialState: WizardState = {
   currentStep: 1,
   data: {
-    species: null,
-    height: null,
-    girth: null,
-    location: null,
+    trees: [createEmptyTree()],
+    currentTreeIndex: 0,
     email: null,
     zipCode: null,
   },
   isComplete: false,
+  isIdentifying: false,
   errors: {},
 };
 
 // ========================================
-// Validation (defined before reducer since reducer uses these)
+// Validation
 // ========================================
 
 function isValidEmail(email: string): boolean {
@@ -93,18 +143,29 @@ function isValidEmail(email: string): boolean {
 }
 
 function validateCurrentStep(state: WizardState): boolean {
-  const { currentStep, data } = state;
+  const { currentStep, data, isIdentifying } = state;
+  const currentTree = data.trees[data.currentTreeIndex];
+
+  // Don't allow advancing if identification is in progress
+  if (isIdentifying) return false;
 
   switch (currentStep) {
-    case 1:
-      return data.species !== null;
-    case 2:
-      return data.height !== null;
-    case 3:
-      return data.girth !== null;
-    case 4:
-      return data.location !== null;
-    case 5:
+    case 1: // Species
+      if (currentTree.species === "other") {
+        // Must have identification result or skip
+        return currentTree.identificationResult !== undefined ||
+               currentTree.identificationPhotos.length === 0;
+      }
+      return currentTree.species !== null;
+    case 2: // Height
+      return currentTree.height !== null;
+    case 3: // Girth
+      return currentTree.girth !== null;
+    case 4: // Location
+      return currentTree.location !== null;
+    case 5: // Health
+      return currentTree.healthCondition !== null;
+    case 6: // Email
       return data.email !== null && isValidEmail(data.email);
     default:
       return false;
@@ -116,68 +177,120 @@ function validateCurrentStep(state: WizardState): boolean {
 // ========================================
 
 function wizardReducer(state: WizardState, action: WizardAction): WizardState {
+  const currentTreeIndex = state.data.currentTreeIndex;
+
+  const updateCurrentTree = (updates: Partial<TreeData>): WizardState => ({
+    ...state,
+    data: {
+      ...state.data,
+      trees: state.data.trees.map((tree, i) =>
+        i === currentTreeIndex ? { ...tree, ...updates } : tree
+      ),
+    },
+  });
+
   switch (action.type) {
     case "SET_SPECIES":
-      return {
-        ...state,
-        data: { ...state.data, species: action.payload },
-        errors: { ...state.errors, species: undefined },
-      };
+      return updateCurrentTree({
+        species: action.payload,
+        // Clear identification if switching away from "other"
+        ...(action.payload !== "other" && {
+          identificationPhotos: [],
+          identificationResult: undefined,
+          customSpecies: undefined,
+        }),
+      });
 
     case "SET_HEIGHT":
-      return {
-        ...state,
-        data: { ...state.data, height: action.payload },
-        errors: { ...state.errors, height: undefined },
-      };
+      return updateCurrentTree({ height: action.payload });
 
     case "SET_GIRTH":
-      return {
-        ...state,
-        data: { ...state.data, girth: action.payload },
-        errors: { ...state.errors, girth: undefined },
-      };
+      return updateCurrentTree({ girth: action.payload });
 
     case "SET_LOCATION":
-      return {
-        ...state,
-        data: { ...state.data, location: action.payload },
-        errors: { ...state.errors, location: undefined },
-      };
+      return updateCurrentTree({ location: action.payload });
+
+    case "SET_HEALTH_CONDITION":
+      return updateCurrentTree({ healthCondition: action.payload });
+
+    case "SET_IDENTIFICATION_PHOTOS":
+      return updateCurrentTree({ identificationPhotos: action.payload });
+
+    case "SET_HEALTH_PHOTOS":
+      return updateCurrentTree({ healthPhotos: action.payload });
+
+    case "SET_IDENTIFICATION_RESULT":
+      return updateCurrentTree({ identificationResult: action.payload });
+
+    case "SET_HEALTH_ASSESSMENT":
+      return updateCurrentTree({ healthAssessment: action.payload });
+
+    case "SET_CUSTOM_SPECIES":
+      return updateCurrentTree({ customSpecies: action.payload });
+
+    case "SET_TREE_NICKNAME":
+      return updateCurrentTree({ nickname: action.payload });
+
+    case "SET_IDENTIFYING":
+      return { ...state, isIdentifying: action.payload };
 
     case "SET_EMAIL":
       return {
         ...state,
         data: { ...state.data, email: action.payload },
-        errors: { ...state.errors, email: undefined },
       };
 
     case "SET_ZIP_CODE":
       return {
         ...state,
         data: { ...state.data, zipCode: action.payload },
-        errors: { ...state.errors, zipCode: undefined },
+      };
+
+    case "ADD_TREE":
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          trees: [...state.data.trees, createEmptyTree()],
+          currentTreeIndex: state.data.trees.length,
+        },
+        currentStep: 1, // Go back to species step for new tree
+      };
+
+    case "REMOVE_TREE": {
+      if (state.data.trees.length <= 1) return state;
+      const newTrees = state.data.trees.filter((_, i) => i !== action.payload);
+      const newIndex = Math.min(currentTreeIndex, newTrees.length - 1);
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          trees: newTrees,
+          currentTreeIndex: newIndex,
+        },
+      };
+    }
+
+    case "SELECT_TREE":
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          currentTreeIndex: Math.max(0, Math.min(action.payload, state.data.trees.length - 1)),
+        },
+        currentStep: 1, // Go to species step when switching trees
       };
 
     case "NEXT_STEP": {
-      // Validate current step before advancing
       if (!validateCurrentStep(state)) {
-        return state; // Don't advance if validation fails
+        return state;
       }
 
-      // If already on last step and valid, mark as complete
       if (state.currentStep === WIZARD_STEPS.length) {
-        return {
-          ...state,
-          isComplete: true,
-        };
+        return { ...state, isComplete: true };
       }
 
-      // Otherwise advance to next step
-      return {
-        ...state,
-        currentStep: state.currentStep + 1,
-      };
+      return { ...state, currentStep: state.currentStep + 1 };
     }
 
     case "PREV_STEP":
@@ -198,11 +311,10 @@ function wizardReducer(state: WizardState, action: WizardAction): WizardState {
         errors: { ...state.errors, [action.payload.field]: action.payload.message },
       };
 
-    case "CLEAR_ERROR":
-      return {
-        ...state,
-        errors: { ...state.errors, [action.payload]: undefined },
-      };
+    case "CLEAR_ERROR": {
+      const { [action.payload]: _, ...rest } = state.errors;
+      return { ...state, errors: rest };
+    }
 
     case "RESET":
       return initialState;
@@ -233,7 +345,7 @@ export function WizardProvider({ children, initialData }: WizardProviderProps) {
     data: { ...initialState.data, ...initialData },
   });
 
-  // Actions
+  // Tree actions
   const setSpecies = useCallback((species: SpeciesCategory) => {
     dispatch({ type: "SET_SPECIES", payload: species });
   }, []);
@@ -250,6 +362,52 @@ export function WizardProvider({ children, initialData }: WizardProviderProps) {
     dispatch({ type: "SET_LOCATION", payload: location });
   }, []);
 
+  const setHealthCondition = useCallback((condition: HealthCondition) => {
+    dispatch({ type: "SET_HEALTH_CONDITION", payload: condition });
+  }, []);
+
+  const setIdentificationPhotos = useCallback((photos: PhotoUpload[]) => {
+    dispatch({ type: "SET_IDENTIFICATION_PHOTOS", payload: photos });
+  }, []);
+
+  const setHealthPhotos = useCallback((photos: PhotoUpload[]) => {
+    dispatch({ type: "SET_HEALTH_PHOTOS", payload: photos });
+  }, []);
+
+  const setIdentificationResult = useCallback((result: KindwiseIdentification) => {
+    dispatch({ type: "SET_IDENTIFICATION_RESULT", payload: result });
+  }, []);
+
+  const setHealthAssessment = useCallback((assessment: KindwiseHealthAssessment) => {
+    dispatch({ type: "SET_HEALTH_ASSESSMENT", payload: assessment });
+  }, []);
+
+  const setCustomSpecies = useCallback((species: string) => {
+    dispatch({ type: "SET_CUSTOM_SPECIES", payload: species });
+  }, []);
+
+  const setTreeNickname = useCallback((nickname: string) => {
+    dispatch({ type: "SET_TREE_NICKNAME", payload: nickname });
+  }, []);
+
+  const setIdentifying = useCallback((isIdentifying: boolean) => {
+    dispatch({ type: "SET_IDENTIFYING", payload: isIdentifying });
+  }, []);
+
+  // Multi-tree actions
+  const addTree = useCallback(() => {
+    dispatch({ type: "ADD_TREE" });
+  }, []);
+
+  const removeTree = useCallback((index: number) => {
+    dispatch({ type: "REMOVE_TREE", payload: index });
+  }, []);
+
+  const selectTree = useCallback((index: number) => {
+    dispatch({ type: "SELECT_TREE", payload: index });
+  }, []);
+
+  // Global actions
   const setEmail = useCallback((email: string) => {
     dispatch({ type: "SET_EMAIL", payload: email });
   }, []);
@@ -259,7 +417,6 @@ export function WizardProvider({ children, initialData }: WizardProviderProps) {
   }, []);
 
   const nextStep = useCallback(() => {
-    // Validation happens inside the reducer to ensure it uses current state
     dispatch({ type: "NEXT_STEP" });
   }, []);
 
@@ -271,11 +428,11 @@ export function WizardProvider({ children, initialData }: WizardProviderProps) {
     dispatch({ type: "GO_TO_STEP", payload: step });
   }, []);
 
-  const setError = useCallback((field: keyof WizardData, message: string) => {
+  const setError = useCallback((field: string, message: string) => {
     dispatch({ type: "SET_ERROR", payload: { field, message } });
   }, []);
 
-  const clearError = useCallback((field: keyof WizardData) => {
+  const clearError = useCallback((field: string) => {
     dispatch({ type: "CLEAR_ERROR", payload: field });
   }, []);
 
@@ -284,19 +441,33 @@ export function WizardProvider({ children, initialData }: WizardProviderProps) {
   }, []);
 
   // Computed values
+  const currentTree = state.data.trees[state.data.currentTreeIndex];
   const canGoNext = useMemo(() => validateCurrentStep(state), [state]);
   const canGoBack = state.currentStep > 1;
   const totalSteps = WIZARD_STEPS.length;
   const currentStepConfig = WIZARD_STEPS[state.currentStep - 1];
   const progress = (state.currentStep / totalSteps) * 100;
+  const treeCount = state.data.trees.length;
 
   const value: WizardContextValue = useMemo(
     () => ({
       ...state,
+      currentTree,
       setSpecies,
       setHeight,
       setGirth,
       setLocation,
+      setHealthCondition,
+      setIdentificationPhotos,
+      setHealthPhotos,
+      setIdentificationResult,
+      setHealthAssessment,
+      setCustomSpecies,
+      setTreeNickname,
+      setIdentifying,
+      addTree,
+      removeTree,
+      selectTree,
       setEmail,
       setZipCode,
       nextStep,
@@ -310,13 +481,26 @@ export function WizardProvider({ children, initialData }: WizardProviderProps) {
       totalSteps,
       currentStepConfig,
       progress,
+      treeCount,
     }),
     [
       state,
+      currentTree,
       setSpecies,
       setHeight,
       setGirth,
       setLocation,
+      setHealthCondition,
+      setIdentificationPhotos,
+      setHealthPhotos,
+      setIdentificationResult,
+      setHealthAssessment,
+      setCustomSpecies,
+      setTreeNickname,
+      setIdentifying,
+      addTree,
+      removeTree,
+      selectTree,
       setEmail,
       setZipCode,
       nextStep,
@@ -330,6 +514,7 @@ export function WizardProvider({ children, initialData }: WizardProviderProps) {
       totalSteps,
       currentStepConfig,
       progress,
+      treeCount,
     ]
   );
 
@@ -353,4 +538,4 @@ export function useWizard(): WizardContextValue {
 }
 
 // Export for testing
-export { validateCurrentStep, isValidEmail, initialState };
+export { validateCurrentStep, isValidEmail, initialState, createEmptyTree };

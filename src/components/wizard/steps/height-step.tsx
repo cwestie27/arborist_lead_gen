@@ -14,7 +14,7 @@ const HEIGHT_ICONS: Record<HeightHeuristic, React.ReactNode> = {
 };
 
 export function HeightStep() {
-  const { data, setHeight } = useWizard();
+  const { currentTree, setHeight } = useWizard();
 
   return (
     <div className="space-y-4">
@@ -34,7 +34,7 @@ export function HeightStep() {
             title={option.label}
             description={option.description}
             icon={HEIGHT_ICONS[option.value]}
-            selected={data.height === option.value}
+            selected={currentTree.height === option.value}
             onClick={() => setHeight(option.value)}
             aria-label={`Select ${option.label}`}
           />

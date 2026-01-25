@@ -31,12 +31,16 @@ function getMockValuation(id: string): TreeValuation & { speciesName: string } {
   const seed = id.split("").reduce((a, b) => a + b.charCodeAt(0), 0);
   const structuralValue = 8000 + (seed % 20000);
   const ecoTotal = 400 + (seed % 800);
+  const carbonLbs = 200 + (seed % 300);
+  const stormwaterGallons = 1500 + (seed % 2000);
 
   return {
     structuralValue,
     ecoValue: {
       carbon: Math.round(ecoTotal * 0.35),
+      carbonLbsPerYear: carbonLbs,
       stormwater: Math.round(ecoTotal * 0.4),
+      stormwaterGallonsPerYear: stormwaterGallons,
       energy: Math.round(ecoTotal * 0.25),
       total: ecoTotal,
     },
@@ -46,6 +50,7 @@ function getMockValuation(id: string): TreeValuation & { speciesName: string } {
       heightFeet: 35 + (seed % 30),
       speciesRating: 0.7 + (seed % 30) / 100,
       regionalMultiplier: 85 + (seed % 40),
+      conditionRating: 0.8,
     },
     speciesName: ["Oak", "Maple", "Pine", "Spruce", "Birch"][seed % 5],
   };

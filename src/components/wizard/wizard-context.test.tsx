@@ -47,20 +47,21 @@ describe("WizardContext", () => {
       });
 
       expect(result.current.currentStep).toBe(1);
-      expect(result.current.data.species).toBeNull();
-      expect(result.current.data.height).toBeNull();
-      expect(result.current.data.girth).toBeNull();
-      expect(result.current.data.location).toBeNull();
+      expect(result.current.currentTree.species).toBeNull();
+      expect(result.current.currentTree.height).toBeNull();
+      expect(result.current.currentTree.girth).toBeNull();
+      expect(result.current.currentTree.location).toBeNull();
+      expect(result.current.currentTree.healthCondition).toBeNull();
       expect(result.current.data.email).toBeNull();
       expect(result.current.isComplete).toBe(false);
+      expect(result.current.treeCount).toBe(1);
     });
 
     it("accepts initial data", () => {
       const { result } = renderHook(() => useWizard(), {
-        wrapper: createWrapper({ species: "oak", zipCode: "22101" }),
+        wrapper: createWrapper({ zipCode: "22101" }),
       });
 
-      expect(result.current.data.species).toBe("oak");
       expect(result.current.data.zipCode).toBe("22101");
     });
   });
@@ -156,7 +157,7 @@ describe("WizardContext", () => {
         result.current.goToStep(100);
       });
 
-      expect(result.current.currentStep).toBe(5); // Max step
+      expect(result.current.currentStep).toBe(6); // Max step
 
       act(() => {
         result.current.goToStep(-1);
@@ -176,7 +177,7 @@ describe("WizardContext", () => {
         result.current.setSpecies("maple");
       });
 
-      expect(result.current.data.species).toBe("maple");
+      expect(result.current.currentTree.species).toBe("maple");
     });
 
     it("sets height correctly", () => {
@@ -188,7 +189,7 @@ describe("WizardContext", () => {
         result.current.setHeight("2_story");
       });
 
-      expect(result.current.data.height).toBe("2_story");
+      expect(result.current.currentTree.height).toBe("2_story");
     });
 
     it("sets girth correctly", () => {
@@ -200,7 +201,7 @@ describe("WizardContext", () => {
         result.current.setGirth("arms_wrap");
       });
 
-      expect(result.current.data.girth).toBe("arms_wrap");
+      expect(result.current.currentTree.girth).toBe("arms_wrap");
     });
 
     it("sets location correctly", () => {
@@ -212,7 +213,19 @@ describe("WizardContext", () => {
         result.current.setLocation("front_yard");
       });
 
-      expect(result.current.data.location).toBe("front_yard");
+      expect(result.current.currentTree.location).toBe("front_yard");
+    });
+
+    it("sets health condition correctly", () => {
+      const { result } = renderHook(() => useWizard(), {
+        wrapper: createWrapper(),
+      });
+
+      act(() => {
+        result.current.setHealthCondition("good");
+      });
+
+      expect(result.current.currentTree.healthCondition).toBe("good");
     });
 
     it("sets email correctly", () => {
@@ -237,6 +250,77 @@ describe("WizardContext", () => {
       });
 
       expect(result.current.data.zipCode).toBe("22101");
+    });
+  });
+
+  describe("multi-tree support", () => {
+    it("adds a new tree", () => {
+      const { result } = renderHook(() => useWizard(), {
+        wrapper: createWrapper(),
+      });
+
+      expect(result.current.treeCount).toBe(1);
+
+      act(() => {
+        result.current.addTree();
+      });
+
+      expect(result.current.treeCount).toBe(2);
+      expect(result.current.data.currentTreeIndex).toBe(1);
+    });
+
+    it("removes a tree", () => {
+      const { result } = renderHook(() => useWizard(), {
+        wrapper: createWrapper(),
+      });
+
+      // Add a tree first
+      act(() => {
+        result.current.addTree();
+      });
+
+      expect(result.current.treeCount).toBe(2);
+
+      act(() => {
+        result.current.removeTree(1);
+      });
+
+      expect(result.current.treeCount).toBe(1);
+    });
+
+    it("cannot remove the last tree", () => {
+      const { result } = renderHook(() => useWizard(), {
+        wrapper: createWrapper(),
+      });
+
+      expect(result.current.treeCount).toBe(1);
+
+      act(() => {
+        result.current.removeTree(0);
+      });
+
+      expect(result.current.treeCount).toBe(1);
+    });
+
+    it("selects a tree", () => {
+      const { result } = renderHook(() => useWizard(), {
+        wrapper: createWrapper(),
+      });
+
+      // Add a tree first and set some data
+      act(() => {
+        result.current.setSpecies("oak");
+        result.current.addTree();
+        result.current.setSpecies("maple");
+      });
+
+      expect(result.current.currentTree.species).toBe("maple");
+
+      act(() => {
+        result.current.selectTree(0);
+      });
+
+      expect(result.current.currentTree.species).toBe("oak");
     });
   });
 
@@ -274,13 +358,20 @@ describe("WizardContext", () => {
       });
       expect(result.current.currentStep).toBe(5);
 
-      // Step 5: Email (invalid first)
+      // Step 5: Health
+      act(() => {
+        result.current.setHealthCondition("good");
+        result.current.nextStep();
+      });
+      expect(result.current.currentStep).toBe(6);
+
+      // Step 6: Email (invalid first)
       act(() => {
         result.current.setEmail("invalid");
       });
       expect(result.current.canGoNext).toBe(false);
 
-      // Step 5: Email (valid)
+      // Step 6: Email (valid)
       act(() => {
         result.current.setEmail("test@example.com");
       });
@@ -312,24 +403,6 @@ describe("WizardContext", () => {
 
       expect(result.current.errors.email).toBeUndefined();
     });
-
-    it("clears error when value is set", () => {
-      const { result } = renderHook(() => useWizard(), {
-        wrapper: createWrapper(),
-      });
-
-      act(() => {
-        result.current.setError("species", "Please select a species");
-      });
-
-      expect(result.current.errors.species).toBe("Please select a species");
-
-      act(() => {
-        result.current.setSpecies("oak");
-      });
-
-      expect(result.current.errors.species).toBeUndefined();
-    });
   });
 
   describe("reset", () => {
@@ -347,7 +420,7 @@ describe("WizardContext", () => {
       });
 
       expect(result.current.currentStep).toBe(3);
-      expect(result.current.data.species).toBe("oak");
+      expect(result.current.currentTree.species).toBe("oak");
 
       // Reset
       act(() => {
@@ -355,8 +428,8 @@ describe("WizardContext", () => {
       });
 
       expect(result.current.currentStep).toBe(1);
-      expect(result.current.data.species).toBeNull();
-      expect(result.current.data.height).toBeNull();
+      expect(result.current.currentTree.species).toBeNull();
+      expect(result.current.currentTree.height).toBeNull();
       expect(result.current.isComplete).toBe(false);
     });
   });
@@ -367,14 +440,15 @@ describe("WizardContext", () => {
         wrapper: createWrapper(),
       });
 
-      expect(result.current.progress).toBe(20); // 1/5 = 20%
+      // 6 total steps now
+      expect(result.current.progress).toBeCloseTo(16.67, 0); // 1/6
 
       act(() => {
         result.current.setSpecies("oak");
         result.current.nextStep();
       });
 
-      expect(result.current.progress).toBe(40); // 2/5 = 40%
+      expect(result.current.progress).toBeCloseTo(33.33, 0); // 2/6
     });
 
     it("provides current step config", () => {
@@ -399,7 +473,7 @@ describe("WizardContext", () => {
         wrapper: createWrapper(),
       });
 
-      expect(result.current.totalSteps).toBe(5);
+      expect(result.current.totalSteps).toBe(6);
     });
   });
 });

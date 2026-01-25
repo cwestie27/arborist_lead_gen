@@ -2,6 +2,8 @@ import type {
   SpeciesCategory,
   HeightHeuristic,
   GirthHeuristic,
+  HealthCondition,
+  LocationType,
   SelectionOption,
 } from "@/types";
 
@@ -38,6 +40,17 @@ export const SPECIES_RATINGS: Record<SpeciesCategory, number> = {
   pine: 0.6,
   fruit_tree: 0.75,
   other: 0.5,
+} as const;
+
+/**
+ * Condition multipliers based on health assessment
+ */
+export const CONDITION_MULTIPLIERS: Record<HealthCondition, number> = {
+  excellent: 1.0,
+  good: 0.8,
+  fair: 0.6,
+  poor: 0.4,
+  critical: 0.2,
 } as const;
 
 // ========================================
@@ -164,7 +177,7 @@ export const SPECIES_OPTIONS: SelectionOption<SpeciesCategory>[] = [
   {
     value: "other",
     label: "Other / Not Sure",
-    description: "Any other tree type",
+    description: "Upload a photo to identify",
   },
 ];
 
@@ -214,6 +227,52 @@ export const GIRTH_OPTIONS: SelectionOption<GirthHeuristic>[] = [
   },
 ];
 
+export const LOCATION_OPTIONS: SelectionOption<LocationType>[] = [
+  {
+    value: "front_yard",
+    label: "Front Yard",
+    description: "Visible from the street",
+  },
+  {
+    value: "back_yard",
+    label: "Backyard",
+    description: "Behind the house",
+  },
+  {
+    value: "side_yard",
+    label: "Side Yard",
+    description: "Along the side of property",
+  },
+];
+
+export const HEALTH_OPTIONS: SelectionOption<HealthCondition>[] = [
+  {
+    value: "excellent",
+    label: "Excellent",
+    description: "Vibrant, no visible issues",
+  },
+  {
+    value: "good",
+    label: "Good",
+    description: "Healthy with minor imperfections",
+  },
+  {
+    value: "fair",
+    label: "Fair",
+    description: "Some dead branches or discoloration",
+  },
+  {
+    value: "poor",
+    label: "Poor",
+    description: "Significant damage or disease visible",
+  },
+  {
+    value: "critical",
+    label: "Critical",
+    description: "Major structural issues or dying",
+  },
+];
+
 // ========================================
 // Wizard Configuration
 // ========================================
@@ -245,6 +304,12 @@ export const WIZARD_STEPS = [
   },
   {
     id: 5,
+    title: "Health",
+    description: "Assess your tree's condition",
+    field: "health" as const,
+  },
+  {
+    id: 6,
     title: "Get Report",
     description: "Enter your email to receive your report",
     field: "email" as const,

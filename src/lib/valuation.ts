@@ -2,15 +2,16 @@ import type {
   SpeciesCategory,
   HeightHeuristic,
   GirthHeuristic,
+  HealthCondition,
   TreeValuation,
 } from "@/types";
 import {
   HEIGHT_MAP,
   GIRTH_MAP,
   SPECIES_RATINGS,
+  CONDITION_MULTIPLIERS,
   REGIONAL_COSTS,
   ZIP_TIERS,
-  CONDITION_RATING,
   LOCATION_RATING,
   MAX_STANDARD_DBH,
   REPLACEMENT_DBH,
@@ -88,6 +89,7 @@ function calculateAdjustedTrunkArea(actualArea: number): number {
 function calculateStructuralValue(
   dbh: number,
   speciesRating: number,
+  conditionRating: number,
   unitCost: number
 ): number {
   let trunkArea = calculateTrunkArea(dbh);
@@ -102,7 +104,7 @@ function calculateStructuralValue(
     trunkArea *
     unitCost *
     speciesRating *
-    CONDITION_RATING *
+    conditionRating *
     LOCATION_RATING;
 
   return Math.round(value);
@@ -113,9 +115,9 @@ function calculateStructuralValue(
 // ========================================
 
 /**
- * Calculates carbon sequestration value
+ * Calculates carbon sequestration - returns both value and raw lbs/year
  */
-function calculateCarbonValue(dbh: number, height: number): number {
+function calculateCarbonSequestration(dbh: number, height: number): { value: number; lbsPerYear: number } {
   // Above Ground Biomass (USDA Allometry)
   const agb = 0.25 * Math.pow(dbh, 2) * height;
 
@@ -123,22 +125,34 @@ function calculateCarbonValue(dbh: number, height: number): number {
   const carbonMass = agb * 0.5; // 50% of dry weight is carbon
   const co2Sequestered = carbonMass * 3.67; // CO2/C atomic ratio
 
-  return co2Sequestered * CO2_VALUE_PER_LB;
+  // Annual sequestration (mature trees sequester ~3-5% of total annually)
+  const annualCo2 = co2Sequestered * 0.04;
+
+  return {
+    value: Math.round(annualCo2 * CO2_VALUE_PER_LB),
+    lbsPerYear: Math.round(annualCo2),
+  };
 }
 
 /**
- * Calculates stormwater interception value
+ * Calculates stormwater interception - returns both value and raw gallons/year
  */
-function calculateStormwaterValue(
+function calculateStormwaterInterception(
   dbh: number,
   height: number,
   speciesRating: number
-): number {
+): { value: number; gallonsPerYear: number } {
   // Evergreens (lower species rating typically) intercept more
   const speciesFactor = speciesRating < 0.7 ? 1.5 : 0.8;
-  const gallonsIntercepted = dbh * height * speciesFactor;
+  // Crown spread approximation based on DBH
+  const crownFactor = Math.PI * Math.pow(dbh * 0.7, 2);
+  // Gallons intercepted annually (rainfall × crown area × interception rate)
+  const gallonsIntercepted = crownFactor * height * speciesFactor * 0.5;
 
-  return gallonsIntercepted * STORMWATER_VALUE_PER_GALLON;
+  return {
+    value: Math.round(gallonsIntercepted * STORMWATER_VALUE_PER_GALLON),
+    gallonsPerYear: Math.round(gallonsIntercepted),
+  };
 }
 
 /**
@@ -155,15 +169,24 @@ function calculateEcoValue(
   dbh: number,
   height: number,
   speciesRating: number
-): { total: number; carbon: number; stormwater: number; energy: number } {
-  const carbon = calculateCarbonValue(dbh, height);
-  const stormwater = calculateStormwaterValue(dbh, height, speciesRating);
+): {
+  total: number;
+  carbon: number;
+  carbonLbsPerYear: number;
+  stormwater: number;
+  stormwaterGallonsPerYear: number;
+  energy: number;
+} {
+  const carbonResult = calculateCarbonSequestration(dbh, height);
+  const stormwaterResult = calculateStormwaterInterception(dbh, height, speciesRating);
   const energy = calculateEnergyValue(height);
 
   return {
-    total: Math.round(carbon + stormwater + energy),
-    carbon: Math.round(carbon),
-    stormwater: Math.round(stormwater),
+    total: Math.round(carbonResult.value + stormwaterResult.value + energy),
+    carbon: carbonResult.value,
+    carbonLbsPerYear: carbonResult.lbsPerYear,
+    stormwater: stormwaterResult.value,
+    stormwaterGallonsPerYear: stormwaterResult.gallonsPerYear,
     energy: Math.round(energy),
   };
 }
@@ -176,6 +199,7 @@ export interface ValuationInputs {
   species: SpeciesCategory;
   height: HeightHeuristic;
   girth: GirthHeuristic;
+  healthCondition?: HealthCondition | null;
   zipCode?: string | null;
 }
 
@@ -187,13 +211,16 @@ export function calculateTreeValue(inputs: ValuationInputs): TreeValuation {
   const rawDbh = GIRTH_MAP[inputs.girth];
   const rawHeight = HEIGHT_MAP[inputs.height];
   const speciesRating = SPECIES_RATINGS[inputs.species];
+  const conditionRating = inputs.healthCondition
+    ? CONDITION_MULTIPLIERS[inputs.healthCondition]
+    : CONDITION_MULTIPLIERS.good; // Default to "good" if not specified
   const unitCost = getRegionalMultiplier(inputs.zipCode || null);
 
   // Validate and adjust for biological congruence
   const { dbh, height } = validateInputs(rawDbh, rawHeight);
 
   // Calculate values
-  const structuralValue = calculateStructuralValue(dbh, speciesRating, unitCost);
+  const structuralValue = calculateStructuralValue(dbh, speciesRating, conditionRating, unitCost);
   const ecoValue = calculateEcoValue(dbh, height, speciesRating);
 
   return {
@@ -205,6 +232,7 @@ export function calculateTreeValue(inputs: ValuationInputs): TreeValuation {
       heightFeet: height,
       speciesRating,
       regionalMultiplier: unitCost,
+      conditionRating,
     },
   };
 }
@@ -225,12 +253,13 @@ Tree Valuation Summary
 Estimated DBH: ${inputs.dbhInches}"
 Estimated Height: ${inputs.heightFeet} ft
 Species Rating: ${(inputs.speciesRating * 100).toFixed(0)}%
+Condition Rating: ${(inputs.conditionRating * 100).toFixed(0)}%
 Regional Cost: $${inputs.regionalMultiplier}/sq in
 
 Structural (Replacement) Value: $${structuralValue.toLocaleString()}
 Annual Ecosystem Benefits: $${ecoValue.total.toLocaleString()}/year
-  - Carbon Sequestration: $${ecoValue.carbon}/year
-  - Stormwater Management: $${ecoValue.stormwater}/year
+  - Carbon Sequestration: $${ecoValue.carbon}/year (${ecoValue.carbonLbsPerYear} lbs CO2)
+  - Stormwater Management: $${ecoValue.stormwater}/year (${ecoValue.stormwaterGallonsPerYear} gal)
   - Energy Savings: $${ecoValue.energy}/year
 `.trim();
 }

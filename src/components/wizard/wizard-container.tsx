@@ -2,7 +2,14 @@
 
 import { useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, TreeDeciduous } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  TreeDeciduous,
+  Plus,
+  X,
+  Check,
+} from "lucide-react";
 import { Button, ProgressIndicator } from "@/components/ui";
 import { useWizard } from "./wizard-context";
 import {
@@ -10,6 +17,7 @@ import {
   HeightStep,
   GirthStep,
   LocationStep,
+  HealthStep,
   EmailStep,
 } from "./steps";
 import { WIZARD_STEPS } from "@/lib/constants";
@@ -42,6 +50,11 @@ export function WizardContainer({ onComplete }: WizardContainerProps) {
     prevStep,
     isComplete,
     totalSteps,
+    data,
+    currentTree,
+    addTree,
+    removeTree,
+    selectTree,
   } = useWizard();
 
   const handleNext = useCallback(() => {
@@ -72,6 +85,8 @@ export function WizardContainer({ onComplete }: WizardContainerProps) {
       case 4:
         return <LocationStep />;
       case 5:
+        return <HealthStep />;
+      case 6:
         return <EmailStep />;
       default:
         return null;
@@ -79,6 +94,30 @@ export function WizardContainer({ onComplete }: WizardContainerProps) {
   };
 
   const stepLabels = WIZARD_STEPS.map((s) => s.title);
+
+  // Check if current tree is complete (has all required fields)
+  const isTreeComplete = (index: number) => {
+    const tree = data.trees[index];
+    return (
+      tree.species !== null &&
+      tree.height !== null &&
+      tree.girth !== null &&
+      tree.location !== null &&
+      tree.healthCondition !== null
+    );
+  };
+
+  // Get tree display name
+  const getTreeName = (index: number) => {
+    const tree = data.trees[index];
+    if (tree.nickname) return tree.nickname;
+    if (tree.customSpecies) return tree.customSpecies;
+    if (tree.identificationResult) return tree.identificationResult.commonName;
+    if (tree.species && tree.species !== "other") {
+      return tree.species.charAt(0).toUpperCase() + tree.species.slice(1).replace("_", " ");
+    }
+    return `Tree ${index + 1}`;
+  };
 
   return (
     <div className="min-h-screen bg-cream">
@@ -99,6 +138,61 @@ export function WizardContainer({ onComplete }: WizardContainerProps) {
         </div>
       </header>
 
+      {/* Tree Selector (Multi-tree) */}
+      {data.trees.length > 0 && (
+        <div className="bg-earth-50 border-b border-earth-200">
+          <div className="max-w-2xl mx-auto px-6 py-3">
+            <div className="flex items-center gap-2 overflow-x-auto pb-1">
+              {data.trees.map((tree, index) => (
+                <button
+                  key={tree.id}
+                  onClick={() => selectTree(index)}
+                  className={`
+                    flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium
+                    whitespace-nowrap transition-all
+                    ${
+                      index === data.currentTreeIndex
+                        ? "bg-forest-600 text-white"
+                        : "bg-white border border-charcoal-200 text-charcoal-700 hover:border-forest-300"
+                    }
+                  `}
+                >
+                  {isTreeComplete(index) && (
+                    <Check className="w-4 h-4 flex-shrink-0" />
+                  )}
+                  <span>{getTreeName(index)}</span>
+                  {data.trees.length > 1 && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeTree(index);
+                      }}
+                      className={`
+                        ml-1 p-0.5 rounded-full hover:bg-black/10
+                        ${index === data.currentTreeIndex ? "text-white/80" : "text-charcoal-400"}
+                      `}
+                      aria-label={`Remove ${getTreeName(index)}`}
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
+                </button>
+              ))}
+
+              <button
+                onClick={addTree}
+                className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium
+                  border-2 border-dashed border-forest-300 text-forest-600
+                  hover:border-forest-500 hover:bg-forest-50 transition-all whitespace-nowrap"
+              >
+                <Plus className="w-4 h-4" />
+                Add Tree
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Progress */}
       <div className="bg-white border-b border-charcoal-100">
         <div className="max-w-2xl mx-auto px-6 py-4">
@@ -115,7 +209,7 @@ export function WizardContainer({ onComplete }: WizardContainerProps) {
         <div className="bg-white rounded-2xl shadow-sm border border-charcoal-100 p-6 md:p-8">
           <AnimatePresence mode="wait" custom={1}>
             <motion.div
-              key={currentStep}
+              key={`${data.currentTreeIndex}-${currentStep}`}
               custom={1}
               variants={stepVariants}
               initial="enter"

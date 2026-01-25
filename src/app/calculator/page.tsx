@@ -5,6 +5,7 @@ import { useCallback, useState } from "react";
 import { WizardProvider, useWizard } from "@/components/wizard";
 import { WizardContainer } from "@/components/wizard/wizard-container";
 import { calculateTreeValue } from "@/lib/valuation";
+import type { PropertyValuation, TreeData, TreeValuation } from "@/types";
 
 function CalculatorContent() {
   const router = useRouter();
@@ -16,33 +17,54 @@ function CalculatorContent() {
     setIsSubmitting(true);
 
     try {
-      // Calculate the tree value
-      if (data.species && data.height && data.girth) {
-        const valuation = calculateTreeValue({
-          species: data.species,
-          height: data.height,
-          girth: data.girth,
-          zipCode: data.zipCode,
-        });
+      // Calculate valuations for all trees
+      const valuatedTrees: Array<TreeData & { valuation: TreeValuation }> = [];
+      let totalStructural = 0;
+      let totalEco = 0;
+      let totalCarbon = 0;
+      let totalStormwater = 0;
+      let totalEnergy = 0;
 
-        // Store in session storage for the results page
-        sessionStorage.setItem(
-          "treeValuation",
-          JSON.stringify({
-            valuation,
-            email: data.email,
-            createdAt: new Date().toISOString(),
-          })
-        );
+      for (const tree of data.trees) {
+        if (tree.species && tree.height && tree.girth && tree.healthCondition) {
+          const valuation = calculateTreeValue({
+            species: tree.species,
+            height: tree.height,
+            girth: tree.girth,
+            healthCondition: tree.healthCondition,
+            zipCode: data.zipCode,
+          });
 
-        // TODO: In production, this would:
-        // 1. Call /api/valuate to create the tree record
-        // 2. Trigger email sending
-        // 3. Redirect to report page with tree ID
-
-        // For now, redirect to a results page
-        router.push("/calculator/results");
+          valuatedTrees.push({ ...tree, valuation });
+          totalStructural += valuation.structuralValue;
+          totalEco += valuation.ecoValue.total;
+          totalCarbon += valuation.ecoValue.carbonLbsPerYear;
+          totalStormwater += valuation.ecoValue.stormwaterGallonsPerYear;
+          totalEnergy += valuation.ecoValue.energy;
+        }
       }
+
+      // Create property valuation summary
+      const propertyValuation: PropertyValuation = {
+        trees: valuatedTrees,
+        totals: {
+          structuralValue: totalStructural,
+          annualEcoValue: totalEco,
+          carbonLbsPerYear: totalCarbon,
+          stormwaterGallonsPerYear: totalStormwater,
+          energySavings: totalEnergy,
+          treeCount: valuatedTrees.length,
+        },
+        email: data.email,
+        zipCode: data.zipCode,
+        createdAt: new Date().toISOString(),
+      };
+
+      // Store in session storage for the results page
+      sessionStorage.setItem("propertyValuation", JSON.stringify(propertyValuation));
+
+      // Redirect to results page
+      router.push("/calculator/results");
     } catch (error) {
       console.error("Error completing wizard:", error);
       setIsSubmitting(false);

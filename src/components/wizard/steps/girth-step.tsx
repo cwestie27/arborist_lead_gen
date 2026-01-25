@@ -14,7 +14,7 @@ const GIRTH_ICONS: Record<GirthHeuristic, React.ReactNode> = {
 };
 
 export function GirthStep() {
-  const { data, setGirth } = useWizard();
+  const { currentTree, setGirth } = useWizard();
 
   return (
     <div className="space-y-4">
@@ -34,7 +34,7 @@ export function GirthStep() {
             title={option.label}
             description={option.description}
             icon={GIRTH_ICONS[option.value]}
-            selected={data.girth === option.value}
+            selected={currentTree.girth === option.value}
             onClick={() => setGirth(option.value)}
             aria-label={`Select ${option.label}`}
           />

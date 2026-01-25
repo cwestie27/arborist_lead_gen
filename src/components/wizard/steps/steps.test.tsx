@@ -49,12 +49,17 @@ describe("Wizard Steps", () => {
       expect(oakButton).toHaveClass("border-forest-700");
     });
 
-    it("shows pre-selected species from initial data", () => {
+    it("shows pre-selected species after selection", async () => {
+      const user = userEvent.setup();
       render(<SpeciesStep />, {
-        wrapper: createWrapper({ species: "maple" }),
+        wrapper: createWrapper(),
       });
 
+      // Select maple
       const mapleButton = screen.getByRole("button", { name: /select maple/i });
+      await user.click(mapleButton);
+
+      // Should now be selected
       expect(mapleButton).toHaveClass("border-forest-700");
     });
   });

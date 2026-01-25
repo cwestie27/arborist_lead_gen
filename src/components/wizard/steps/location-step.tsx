@@ -34,7 +34,7 @@ const LOCATION_OPTIONS: LocationOption[] = [
 ];
 
 export function LocationStep() {
-  const { data, setLocation } = useWizard();
+  const { currentTree, setLocation } = useWizard();
 
   return (
     <div className="space-y-4">
@@ -54,7 +54,7 @@ export function LocationStep() {
             title={option.label}
             description={option.description}
             icon={option.icon}
-            selected={data.location === option.value}
+            selected={currentTree.location === option.value}
             onClick={() => setLocation(option.value)}
             aria-label={`Select ${option.label}`}
           />
