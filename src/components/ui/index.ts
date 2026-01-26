@@ -14,3 +14,4 @@ export {
 export { Input, type InputProps } from "./input";
 export { ProgressIndicator, type ProgressIndicatorProps } from "./progress";
 export { PhotoUpload } from "./PhotoUpload";
+export { TreeInfoCard } from "./TreeInfoCard";

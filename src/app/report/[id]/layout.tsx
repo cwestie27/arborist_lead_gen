@@ -1,27 +1,40 @@
 import type { Metadata } from "next";
+import { getReport } from "@/lib/reports";
 
 type Props = {
   params: Promise<{ id: string }>;
 };
 
-// Generate mock data for metadata - same logic as page
-function getMockData(id: string) {
-  const seed = id.split("").reduce((a, b) => a + b.charCodeAt(0), 0);
-  const structuralValue = 8000 + (seed % 20000);
-  const ecoTotal = 400 + (seed % 800);
-  const speciesName = ["Oak", "Maple", "Pine", "Spruce", "Birch"][seed % 5];
-
-  return { structuralValue, ecoTotal, speciesName };
-}
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const { structuralValue, ecoTotal, speciesName } = getMockData(id);
 
-  const title = `${speciesName} Tree Worth $${structuralValue.toLocaleString()}`;
-  const description = `This ${speciesName} tree has a replacement value of $${structuralValue.toLocaleString()} and provides $${ecoTotal.toLocaleString()}/year in ecosystem benefits.`;
+  // Validate UUID format
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!uuidRegex.test(id)) {
+    return {
+      title: "Report Not Found | TreeValue Pro",
+      description: "This tree valuation report could not be found.",
+    };
+  }
 
-  const ogImageUrl = `/api/og?species=${encodeURIComponent(speciesName)}&value=${structuralValue.toLocaleString()}&eco=${ecoTotal.toLocaleString()}`;
+  const { data } = await getReport(id);
+
+  if (!data) {
+    return {
+      title: "Report Not Found | TreeValue Pro",
+      description: "This tree valuation report could not be found.",
+    };
+  }
+
+  const { totals } = data;
+  const treeWord = totals.treeCount === 1 ? "Tree" : "Trees";
+  const structuralValue = totals.structuralValue.toLocaleString();
+  const ecoValue = totals.annualEcoValue.toLocaleString();
+
+  const title = `${totals.treeCount} ${treeWord} Worth $${structuralValue}`;
+  const description = `This property has ${totals.treeCount} ${treeWord.toLowerCase()} with a combined replacement value of $${structuralValue} and $${ecoValue}/year in ecosystem benefits.`;
+
+  const ogImageUrl = `/api/og?trees=${totals.treeCount}&value=${structuralValue}&eco=${ecoValue}`;
 
   return {
     title,
@@ -35,7 +48,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           url: ogImageUrl,
           width: 1200,
           height: 630,
-          alt: `${speciesName} Tree Valuation - $${structuralValue.toLocaleString()}`,
+          alt: `Property Tree Valuation - $${structuralValue}`,
         },
       ],
     },

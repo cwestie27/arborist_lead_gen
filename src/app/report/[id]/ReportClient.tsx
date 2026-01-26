@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import Link from "next/link";
 import {
   TreeDeciduous,
@@ -9,14 +8,12 @@ import {
   Droplets,
   Zap,
   ArrowRight,
-  RotateCcw,
+  Share2,
   ExternalLink,
   ChevronDown,
   ChevronUp,
   Heart,
   Wind,
-  Mail,
-  CheckCircle,
 } from "lucide-react";
 import { Button, Card, CardContent, TreeInfoCard } from "@/components/ui";
 import { formatCurrency } from "@/lib/utils";
@@ -25,10 +22,10 @@ import type { TreeSpeciesInfo } from "@/lib/tree-database";
 import type { PropertyValuation, TreeData, TreeValuation } from "@/types";
 
 // Generate tracked affiliate link
-function getTrackedLink(target: string, email: string | null): string {
+function getTrackedLink(target: string, reportId: string, email: string | null): string {
   const params = new URLSearchParams({
     target,
-    tree_id: "property",
+    report_id: reportId,
     ...(email && { uid: email }),
   });
   return `/api/redirect?${params.toString()}`;
@@ -47,30 +44,22 @@ function getTreeDisplayName(tree: TreeData, index: number): string {
 
 // Look up tree species info from database
 function getTreeSpeciesInfo(tree: TreeData): TreeSpeciesInfo | null {
-  // Try scientific name first (most accurate)
   if (tree.identificationResult?.scientificName) {
     const info = getTreeInfo(tree.identificationResult.scientificName);
     if (info) return info;
   }
-
-  // Try common name from identification
   if (tree.identificationResult?.commonName) {
     const info = getTreeInfo(tree.identificationResult.commonName);
     if (info) return info;
   }
-
-  // Try custom species name
   if (tree.customSpecies) {
     const info = getTreeInfo(tree.customSpecies);
     if (info) return info;
   }
-
-  // Try species category (oak, maple, etc.)
   if (tree.species && tree.species !== "other") {
     const info = getTreeInfo(tree.species);
     if (info) return info;
   }
-
   return null;
 }
 
@@ -174,92 +163,38 @@ function TreeCard({
   );
 }
 
-export default function ResultsPage() {
-  const router = useRouter();
-  const [data, setData] = useState<PropertyValuation | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+interface ReportClientProps {
+  data: PropertyValuation;
+  reportId: string;
+}
+
+export function ReportClient({ data, reportId }: ReportClientProps) {
+  const [shareSuccess, setShareSuccess] = useState(false);
   const [expandedTrees, setExpandedTrees] = useState<Set<number>>(new Set());
-  const [emailStatus, setEmailStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
-  const [reportId, setReportId] = useState<string | null>(null);
-  const emailSentRef = useRef(false);
 
-  // Save report and send email
-  const saveAndSendReport = useCallback(async (valuation: PropertyValuation) => {
-    // Skip if already sent this session or no email
-    if (emailSentRef.current) return;
-    if (!valuation.email) return;
+  const { trees, totals } = data;
+  const hasMultipleTrees = trees.length > 1;
 
-    // Check sessionStorage flag to prevent duplicate sends
-    const sentKey = `report_sent_${valuation.createdAt}`;
-    if (sessionStorage.getItem(sentKey)) {
-      emailSentRef.current = true;
-      return;
-    }
-
-    emailSentRef.current = true;
-    setEmailStatus("sending");
-
-    try {
-      // Step 1: Save report to database
-      const saveResponse = await fetch("/api/save-report", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ propertyValuation: valuation }),
-      });
-
-      if (!saveResponse.ok) {
-        throw new Error("Failed to save report");
-      }
-
-      const { reportId: savedReportId } = await saveResponse.json();
-      setReportId(savedReportId);
-
-      // Step 2: Send email with report link
-      const emailResponse = await fetch("/api/send-property-report", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: valuation.email,
-          reportId: savedReportId,
-          totalValue: valuation.totals.structuralValue,
-          treeCount: valuation.totals.treeCount,
-          annualEcoValue: valuation.totals.annualEcoValue,
-          carbonLbsPerYear: valuation.totals.carbonLbsPerYear,
-          stormwaterGallonsPerYear: valuation.totals.stormwaterGallonsPerYear,
-        }),
-      });
-
-      if (!emailResponse.ok) {
-        throw new Error("Failed to send email");
-      }
-
-      // Mark as sent in sessionStorage
-      sessionStorage.setItem(sentKey, "true");
-      setEmailStatus("sent");
-    } catch (error) {
-      console.error("Error saving/sending report:", error);
-      setEmailStatus("error");
-    }
-  }, []);
-
-  useEffect(() => {
-    const stored = sessionStorage.getItem("propertyValuation");
-    if (stored) {
+  const handleShare = async () => {
+    const url = window.location.href;
+    if (navigator.share) {
       try {
-        const parsed = JSON.parse(stored);
-        queueMicrotask(() => {
-          setData(parsed);
-          setIsLoading(false);
-          // Trigger report save and email send
-          saveAndSendReport(parsed);
+        await navigator.share({
+          title: hasMultipleTrees
+            ? `My ${totals.treeCount} Trees are Worth ${formatCurrency(totals.structuralValue)}!`
+            : `My Tree is Worth ${formatCurrency(totals.structuralValue)}!`,
+          text: "I just discovered my tree's value using TreeValue Pro!",
+          url,
         });
       } catch {
-        router.push("/calculator");
+        // User cancelled or share failed
       }
     } else {
-      router.push("/calculator");
+      await navigator.clipboard.writeText(url);
+      setShareSuccess(true);
+      setTimeout(() => setShareSuccess(false), 2000);
     }
-  }, [router, saveAndSendReport]);
+  };
 
   const toggleTree = (index: number) => {
     setExpandedTrees((prev) => {
@@ -273,63 +208,8 @@ export default function ResultsPage() {
     });
   };
 
-  if (isLoading || !data) {
-    return (
-      <div className="min-h-screen bg-cream flex items-center justify-center">
-        <div className="animate-pulse text-charcoal-500">Loading results...</div>
-      </div>
-    );
-  }
-
-  const { trees, totals } = data;
-  const hasMultipleTrees = trees.length > 1;
-
   return (
     <div className="min-h-screen bg-cream">
-      {/* Email Status Banner */}
-      {data.email && emailStatus !== "idle" && (
-        <div
-          className={`py-3 px-4 text-center text-sm ${
-            emailStatus === "sending"
-              ? "bg-blue-50 text-blue-700"
-              : emailStatus === "sent"
-              ? "bg-green-50 text-green-700"
-              : "bg-amber-50 text-amber-700"
-          }`}
-        >
-          <div className="max-w-4xl mx-auto flex items-center justify-center gap-2">
-            {emailStatus === "sending" && (
-              <>
-                <Mail className="w-4 h-4 animate-pulse" />
-                <span>Sending your report to {data.email}...</span>
-              </>
-            )}
-            {emailStatus === "sent" && (
-              <>
-                <CheckCircle className="w-4 h-4" />
-                <span>
-                  Report sent to {data.email}!{" "}
-                  {reportId && (
-                    <Link
-                      href={`/report/${reportId}`}
-                      className="underline font-medium hover:text-green-800"
-                    >
-                      View online report
-                    </Link>
-                  )}
-                </span>
-              </>
-            )}
-            {emailStatus === "error" && (
-              <>
-                <Mail className="w-4 h-4" />
-                <span>Could not send email. Your results are saved below.</span>
-              </>
-            )}
-          </div>
-        </div>
-      )}
-
       {/* Header */}
       <header className="bg-forest-700 text-white">
         <div className="max-w-4xl mx-auto px-6 py-12 md:py-16 text-center">
@@ -348,9 +228,17 @@ export default function ResultsPage() {
             {formatCurrency(totals.structuralValue)}
           </div>
 
-          <p className="text-forest-100 text-lg">
+          <p className="text-forest-100 text-lg mb-6">
             Total replacement value based on CTLA Trunk Formula Method
           </p>
+
+          <Button
+            variant="secondary"
+            leftIcon={<Share2 className="w-4 h-4" />}
+            onClick={handleShare}
+          >
+            {shareSuccess ? "Link Copied!" : "Share This Report"}
+          </Button>
         </div>
       </header>
 
@@ -496,7 +384,7 @@ export default function ResultsPage() {
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a
-                  href={getTrackedLink("arborist", data.email)}
+                  href={getTrackedLink("arborist", reportId, data.email)}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -509,7 +397,7 @@ export default function ResultsPage() {
                 </a>
 
                 <a
-                  href={getTrackedLink("pruning", data.email)}
+                  href={getTrackedLink("pruning", reportId, data.email)}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -526,20 +414,14 @@ export default function ResultsPage() {
           </CardContent>
         </Card>
 
-        {/* Footer Actions */}
-        <div className="flex items-center justify-between mt-8 pt-8 border-t border-charcoal-200">
+        {/* Calculate Your Own CTA */}
+        <div className="mt-12 text-center">
+          <p className="text-charcoal-600 mb-4">
+            Want to assess more trees?
+          </p>
           <Link href="/calculator">
-            <Button
-              variant="ghost"
-              leftIcon={<RotateCcw className="w-4 h-4" />}
-            >
+            <Button size="lg" rightIcon={<ArrowRight className="w-4 h-4" />}>
               Start New Assessment
-            </Button>
-          </Link>
-
-          <Link href="/">
-            <Button variant="ghost" rightIcon={<ArrowRight className="w-4 h-4" />}>
-              Back to Home
             </Button>
           </Link>
         </div>
@@ -552,9 +434,12 @@ export default function ResultsPage() {
             Valuations are estimates based on the CTLA Trunk Formula Method and
             i-Tree ecosystem algorithms.
           </p>
-          <p>
+          <p className="mb-4">
             For official appraisals, please consult a certified arborist in your
             area.
+          </p>
+          <p className="text-charcoal-500 text-xs">
+            Report ID: {reportId.slice(0, 8)} | Valid for 90 days
           </p>
         </div>
       </footer>

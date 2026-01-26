@@ -8,7 +8,7 @@ import {
 
 export async function POST(request: NextRequest) {
   try {
-    const apiKey = process.env.KINDWISE_API_KEY;
+    const apiKey = process.env.Kindwise_API_Key;
     if (!apiKey) {
       return NextResponse.json(
         { error: "Kindwise API key not configured" },
