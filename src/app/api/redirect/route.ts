@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
+import { createAdminClient } from "@/lib/supabase/server";
 
 // Force dynamic to prevent caching
 export const dynamic = "force-dynamic";
@@ -109,17 +110,22 @@ export async function GET(request: NextRequest) {
 
     // Log click (only if not rate limited)
     if (!rateLimited) {
-      // TODO: In production, save to database
-      // const supabase = createAdminClient();
-      // await supabase.from('ad_clicks').insert({
-      //   tree_id: treeId,
-      //   user_id: userId,
-      //   target_url: target,
-      //   ip_address: ip,
-      //   user_agent: userAgent,
-      // });
+      // Save click to database
+      try {
+        const supabase = createAdminClient();
+        await supabase.from('ad_clicks').insert({
+          tree_id: treeId || null,
+          user_id: userId || null,
+          target_url: PARTNER_URLS[target],
+          ip_address: ip,
+          user_agent: userAgent,
+        });
+      } catch (dbError) {
+        // Log but don't fail the redirect
+        console.error("Failed to save click to database:", dbError);
+      }
 
-      // For now, just log to console
+      // Also log to console for debugging
       console.log("Click tracked:", {
         target,
         treeId,

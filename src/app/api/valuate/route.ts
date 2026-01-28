@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { calculateTreeValue } from "@/lib/valuation";
+import { createAdminClient } from "@/lib/supabase/server";
 import type {
   SpeciesCategory,
   HeightHeuristic,
@@ -166,9 +167,22 @@ export async function POST(request: NextRequest) {
       zipCode,
     });
 
-    // TODO: In production, save to database and send email
-    // const supabase = createAdminClient();
-    // await supabase.from('trees').insert({ ... });
+    // Save tree valuation to database
+    try {
+      const supabase = createAdminClient();
+      await supabase.from('trees').insert({
+        user_id: null,
+        species_input: species,
+        height_heuristic: height,
+        girth_heuristic: girth,
+        zip_code: zipCode || null,
+        calculated_value_structural: valuation.structuralValue,
+        calculated_value_eco: valuation.ecoValue.total,
+      });
+    } catch (dbError) {
+      // Log but don't fail the request - valuation still works without persistence
+      console.error("Failed to save tree to database:", dbError);
+    }
 
     return NextResponse.json({
       success: true,

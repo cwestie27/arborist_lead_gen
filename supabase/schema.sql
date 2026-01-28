@@ -133,21 +133,19 @@ CREATE TRIGGER update_profiles_updated_at
 -- ===========================================
 -- STORAGE BUCKET (for tree images)
 -- ===========================================
--- Run this separately or via Supabase dashboard
+-- Run this separately via Supabase SQL Editor (storage operations)
 
--- INSERT INTO storage.buckets (id, name, public)
--- VALUES ('tree-images', 'tree-images', true);
+INSERT INTO storage.buckets (id, name, public, file_size_limit)
+VALUES ('tree-images', 'tree-images', true, 5242880)
+ON CONFLICT (id) DO NOTHING;
 
--- CREATE POLICY "Anyone can view tree images"
---   ON storage.objects FOR SELECT
---   USING (bucket_id = 'tree-images');
+CREATE POLICY "Anyone can view tree images"
+  ON storage.objects FOR SELECT
+  USING (bucket_id = 'tree-images');
 
--- CREATE POLICY "Authenticated users can upload tree images"
---   ON storage.objects FOR INSERT
---   WITH CHECK (
---     bucket_id = 'tree-images'
---     AND auth.role() = 'authenticated'
---   );
+CREATE POLICY "Service role can upload images"
+  ON storage.objects FOR INSERT
+  WITH CHECK (bucket_id = 'tree-images');
 
 -- ===========================================
 -- SAMPLE DATA (for testing)
@@ -170,3 +168,34 @@ CREATE TRIGGER update_profiles_updated_at
 --   18330.00,
 --   145.00
 -- );
+
+-- ===========================================
+-- REPORTS TABLE
+-- ===========================================
+-- Stores property valuation reports for sharing
+
+CREATE TABLE IF NOT EXISTS reports (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  email TEXT,
+  zip_code TEXT,
+  property_valuation JSONB NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  expires_at TIMESTAMPTZ DEFAULT (NOW() + INTERVAL '90 days') NOT NULL
+);
+
+-- Create indexes for lookups
+CREATE INDEX IF NOT EXISTS idx_reports_expires_at ON reports(expires_at);
+CREATE INDEX IF NOT EXISTS idx_reports_email ON reports(email);
+
+-- Enable Row Level Security
+ALTER TABLE reports ENABLE ROW LEVEL SECURITY;
+
+-- Anyone can view reports by ID (for sharing)
+CREATE POLICY "Anyone can view reports by ID"
+  ON reports FOR SELECT
+  USING (true);
+
+-- Service role can insert reports (from API route)
+CREATE POLICY "Service role can insert reports"
+  ON reports FOR INSERT
+  WITH CHECK (true);

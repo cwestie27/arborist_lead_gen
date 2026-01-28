@@ -324,4 +324,63 @@ test.describe("API Routes", () => {
     // Should redirect (307) to partner URL
     expect(response.status()).toBe(307);
   });
+
+  test("POST /api/save-report creates a report", async ({ request }) => {
+    const response = await request.post("/api/save-report", {
+      data: {
+        email: "e2e-test@example.com",
+        zipCode: "22101",
+        propertyValuation: {
+          totalStructuralValue: 15000,
+          totalEcoValue: 200,
+          treeCount: 1,
+          trees: [
+            {
+              species: "oak",
+              height: "2_story",
+              girth: "arms_wrap",
+              location: "front_yard",
+              structuralValue: 15000,
+              ecoValue: { total: 200 },
+            },
+          ],
+        },
+      },
+    });
+
+    expect(response.status()).toBe(200);
+
+    const data = await response.json();
+    expect(data.success).toBe(true);
+    expect(data.reportId).toBeDefined();
+    expect(typeof data.reportId).toBe("string");
+  });
+
+  test("POST /api/upload-photo validates file presence", async ({ request }) => {
+    const response = await request.post("/api/upload-photo", {
+      multipart: {},
+    });
+
+    expect(response.status()).toBe(400);
+    const data = await response.json();
+    expect(data.error).toBeDefined();
+  });
+
+  test("POST /api/upload-photo validates file type", async ({ request }) => {
+    const textBuffer = Buffer.from("not an image");
+
+    const response = await request.post("/api/upload-photo", {
+      multipart: {
+        file: {
+          name: "test.txt",
+          mimeType: "text/plain",
+          buffer: textBuffer,
+        },
+      },
+    });
+
+    expect(response.status()).toBe(400);
+    const data = await response.json();
+    expect(data.error).toContain("Invalid file type");
+  });
 });

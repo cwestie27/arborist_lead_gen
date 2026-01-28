@@ -13,6 +13,8 @@ interface PhotoUploadProps {
   description?: string;
   acceptTypes?: string;
   isLoading?: boolean;
+  uploadImmediately?: boolean;
+  onUploadComplete?: (url: string) => void;
 }
 
 function generateId(): string {
@@ -33,6 +35,24 @@ async function fileToBase64(file: File): Promise<string> {
   });
 }
 
+async function uploadToStorage(file: File): Promise<string> {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await fetch("/api/upload-photo", {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || "Upload failed");
+  }
+
+  const data = await response.json();
+  return data.url;
+}
+
 export function PhotoUpload({
   photos,
   onPhotosChange,
@@ -41,8 +61,11 @@ export function PhotoUpload({
   description = "Drag and drop or click to upload",
   acceptTypes = "image/jpeg,image/png,image/webp",
   isLoading = false,
+  uploadImmediately = false,
+  onUploadComplete,
 }: PhotoUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFiles = useCallback(
@@ -51,19 +74,43 @@ export function PhotoUpload({
       const remainingSlots = maxPhotos - photos.length;
       const filesToProcess = fileArray.slice(0, remainingSlots);
 
-      const newPhotos: PhotoUploadType[] = await Promise.all(
-        filesToProcess.map(async (file) => ({
-          id: generateId(),
-          base64: await fileToBase64(file),
-          fileName: file.name,
-          mimeType: file.type,
-          uploadedAt: new Date().toISOString(),
-        }))
-      );
-
-      onPhotosChange([...photos, ...newPhotos]);
+      if (uploadImmediately) {
+        setIsUploading(true);
+        try {
+          const newPhotos: PhotoUploadType[] = await Promise.all(
+            filesToProcess.map(async (file) => {
+              const url = await uploadToStorage(file);
+              onUploadComplete?.(url);
+              return {
+                id: generateId(),
+                base64: await fileToBase64(file),
+                fileName: file.name,
+                mimeType: file.type,
+                uploadedAt: new Date().toISOString(),
+                url,
+              };
+            })
+          );
+          onPhotosChange([...photos, ...newPhotos]);
+        } catch (error) {
+          console.error("Upload failed:", error);
+        } finally {
+          setIsUploading(false);
+        }
+      } else {
+        const newPhotos: PhotoUploadType[] = await Promise.all(
+          filesToProcess.map(async (file) => ({
+            id: generateId(),
+            base64: await fileToBase64(file),
+            fileName: file.name,
+            mimeType: file.type,
+            uploadedAt: new Date().toISOString(),
+          }))
+        );
+        onPhotosChange([...photos, ...newPhotos]);
+      }
     },
-    [photos, onPhotosChange, maxPhotos]
+    [photos, onPhotosChange, maxPhotos, uploadImmediately, onUploadComplete]
   );
 
   const handleDrop = useCallback(
@@ -153,7 +200,7 @@ export function PhotoUpload({
                 ? "border-forest-500 bg-forest-50"
                 : "border-charcoal-300 hover:border-forest-400 hover:bg-forest-50/50"
             }
-            ${isLoading ? "pointer-events-none opacity-60" : ""}
+            ${isLoading || isUploading ? "pointer-events-none opacity-60" : ""}
           `}
         >
           <input
@@ -165,10 +212,12 @@ export function PhotoUpload({
             className="hidden"
           />
 
-          {isLoading ? (
+          {isLoading || isUploading ? (
             <div className="flex flex-col items-center gap-3">
               <Loader2 className="w-10 h-10 text-forest-500 animate-spin" />
-              <p className="text-sm text-charcoal-600">Analyzing photos...</p>
+              <p className="text-sm text-charcoal-600">
+                {isUploading ? "Uploading photos..." : "Analyzing photos..."}
+              </p>
             </div>
           ) : (
             <div className="flex flex-col items-center gap-3">
@@ -193,7 +242,7 @@ export function PhotoUpload({
       )}
 
       {/* Mobile Camera Button */}
-      {canAddMore && !isLoading && (
+      {canAddMore && !isLoading && !isUploading && (
         <Button
           variant="secondary"
           className="w-full md:hidden"
