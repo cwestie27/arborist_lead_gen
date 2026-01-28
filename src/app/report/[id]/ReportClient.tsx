@@ -71,20 +71,29 @@ function TreeCard({
   onToggle,
   treeInfo,
 }: {
-  tree: TreeData & { valuation: TreeValuation };
+  tree: TreeData & { valuation?: TreeValuation };
   index: number;
   isExpanded: boolean;
   onToggle: () => void;
   treeInfo: TreeSpeciesInfo | null;
 }) {
   const name = getTreeDisplayName(tree, index);
+  const healthCondition = tree.healthCondition || "good";
   const healthColor = {
     excellent: "text-green-600",
     good: "text-blue-600",
     fair: "text-yellow-600",
     poor: "text-orange-600",
     critical: "text-red-600",
-  }[tree.healthCondition || "good"];
+  }[healthCondition];
+
+  // Safe valuation access with defaults
+  const defaultValuation = {
+    structuralValue: 0,
+    ecoValue: { total: 0, carbonLbsPerYear: 0, stormwaterGallonsPerYear: 0 },
+    inputs: { dbhInches: 0, heightFeet: 0 },
+  };
+  const valuation = tree.valuation ?? defaultValuation;
 
   return (
     <div className="space-y-3">
@@ -100,14 +109,14 @@ function TreeCard({
             <div className="text-left">
               <p className="font-semibold text-charcoal-900">{name}</p>
               <p className={`text-sm ${healthColor}`}>
-                {tree.healthCondition?.charAt(0).toUpperCase()}
-                {tree.healthCondition?.slice(1)} condition
+                {healthCondition.charAt(0).toUpperCase()}
+                {healthCondition.slice(1)} condition
               </p>
             </div>
           </div>
           <div className="flex items-center gap-4">
             <span className="font-mono text-lg font-bold text-forest-700">
-              {formatCurrency(tree.valuation.structuralValue)}
+              {formatCurrency(valuation.structuralValue)}
             </span>
             {isExpanded ? (
               <ChevronUp className="w-5 h-5 text-charcoal-400" />
@@ -122,19 +131,19 @@ function TreeCard({
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-4 text-sm">
               <div>
                 <p className="text-charcoal-500">DBH</p>
-                <p className="font-semibold">{tree.valuation.inputs.dbhInches}&quot;</p>
+                <p className="font-semibold">{valuation.inputs?.dbhInches ?? "—"}&quot;</p>
               </div>
               <div>
                 <p className="text-charcoal-500">Height</p>
-                <p className="font-semibold">{tree.valuation.inputs.heightFeet} ft</p>
+                <p className="font-semibold">{valuation.inputs?.heightFeet ?? "—"} ft</p>
               </div>
               <div>
                 <p className="text-charcoal-500">Carbon/yr</p>
-                <p className="font-semibold">{tree.valuation.ecoValue.carbonLbsPerYear} lbs</p>
+                <p className="font-semibold">{valuation.ecoValue?.carbonLbsPerYear ?? 0} lbs</p>
               </div>
               <div>
                 <p className="text-charcoal-500">Stormwater/yr</p>
-                <p className="font-semibold">{tree.valuation.ecoValue.stormwaterGallonsPerYear} gal</p>
+                <p className="font-semibold">{valuation.ecoValue?.stormwaterGallonsPerYear ?? 0} gal</p>
               </div>
             </div>
 
@@ -172,7 +181,17 @@ export function ReportClient({ data, reportId }: ReportClientProps) {
   const [shareSuccess, setShareSuccess] = useState(false);
   const [expandedTrees, setExpandedTrees] = useState<Set<number>>(new Set());
 
-  const { trees, totals } = data;
+  // Safely extract data with defaults for missing fields
+  const trees = data?.trees || [];
+  const rawTotals = data?.totals as Record<string, unknown> | undefined;
+  const totals = {
+    treeCount: (rawTotals?.treeCount as number) ?? trees.length ?? 0,
+    structuralValue: (rawTotals?.structuralValue as number) ?? 0,
+    annualEcoValue: (rawTotals?.annualEcoValue as number) ?? (rawTotals?.ecoValue as number) ?? 0,
+    carbonLbsPerYear: (rawTotals?.carbonLbsPerYear as number) ?? 0,
+    stormwaterGallonsPerYear: (rawTotals?.stormwaterGallonsPerYear as number) ?? 0,
+    energySavings: (rawTotals?.energySavings as number) ?? 0,
+  };
   const hasMultipleTrees = trees.length > 1;
 
   const handleShare = async () => {

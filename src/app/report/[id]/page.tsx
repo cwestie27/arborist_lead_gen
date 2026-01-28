@@ -27,6 +27,11 @@ export default async function ReportPage({ params }: PageProps) {
     return <ReportNotFound message={error || "Report not found"} />;
   }
 
+  // Validate required data structure
+  if (!data.totals || typeof data.totals !== "object") {
+    return <ReportNotFound message="Report data is incomplete or corrupted" />;
+  }
+
   return <ReportClient data={data} reportId={id} />;
 }
 
