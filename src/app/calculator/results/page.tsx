@@ -21,11 +21,15 @@ import {
 import { Button, Card, CardContent, TreeInfoCard } from "@/components/ui";
 import { formatCurrency } from "@/lib/utils";
 import { getTreeInfo } from "@/lib/tree-database";
+import { MetaEvents } from "@/components/MetaPixel";
 import type { TreeSpeciesInfo } from "@/lib/tree-database";
 import type { PropertyValuation, TreeData, TreeValuation } from "@/types";
 
 // Generate tracked affiliate link
 function getTrackedLink(target: string, email: string | null): string {
+  // Track affiliate click in Meta Pixel
+  MetaEvents.affiliateClicked(target);
+
   const params = new URLSearchParams({
     target,
     tree_id: "property",
@@ -250,6 +254,8 @@ export default function ResultsPage() {
         queueMicrotask(() => {
           setData(parsed);
           setIsLoading(false);
+          // Track report view
+          MetaEvents.reportViewed();
           // Trigger report save and email send
           saveAndSendReport(parsed);
         });

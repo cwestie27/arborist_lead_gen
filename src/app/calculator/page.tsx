@@ -1,16 +1,23 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { WizardProvider, useWizard } from "@/components/wizard";
 import { WizardContainer } from "@/components/wizard/wizard-container";
 import { calculateTreeValue } from "@/lib/valuation";
+import { MetaEvents } from "@/components/MetaPixel";
 import type { PropertyValuation, TreeData, TreeValuation } from "@/types";
 
 function CalculatorContent() {
   const router = useRouter();
   const { data, isComplete } = useWizard();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Track wizard start on mount
+  useEffect(() => {
+    MetaEvents.viewContent("Tree Calculator");
+    MetaEvents.wizardStarted();
+  }, []);
 
   const handleComplete = useCallback(async () => {
     if (isSubmitting) return;
@@ -62,6 +69,14 @@ function CalculatorContent() {
 
       // Store in session storage for the results page
       sessionStorage.setItem("propertyValuation", JSON.stringify(propertyValuation));
+
+      // Track conversion events
+      MetaEvents.completeRegistration(totalStructural);
+      MetaEvents.valuationCompleted(totalStructural, totalEco);
+      if (data.email) {
+        MetaEvents.lead(totalStructural);
+        MetaEvents.emailCaptured();
+      }
 
       // Redirect to results page
       router.push("/calculator/results");
