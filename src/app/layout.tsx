@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { StructuredData } from "@/components/StructuredData";
+import { CookieConsent } from "@/components/CookieConsent";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -92,8 +94,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable} ${jetbrainsMono.variable}`}>
+      <head>
+        <StructuredData />
+      </head>
       <body className="min-h-screen bg-cream text-charcoal-800 antialiased">
         {children}
+        <CookieConsent />
       </body>
     </html>
   );
