@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Trees, Plus, LogOut, Calendar, DollarSign } from "lucide-react";
+import { Trees, Plus, LogOut, Calendar, DollarSign, BarChart3 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Button, Card, CardContent } from "@/components/ui";
 import { formatCurrency } from "@/lib/utils";
@@ -57,6 +57,11 @@ export default async function DashboardPage() {
             </span>
           </Link>
           <div className="flex items-center gap-4">
+            <Link href="/admin/analytics">
+              <Button variant="ghost" size="sm" title="Analytics">
+                <BarChart3 className="w-4 h-4" />
+              </Button>
+            </Link>
             <span className="text-sm text-charcoal-600">{user.email}</span>
             <form action="/auth/signout" method="POST">
               <Button variant="ghost" size="sm" type="submit">

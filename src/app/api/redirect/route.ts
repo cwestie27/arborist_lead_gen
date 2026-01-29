@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { createAdminClient } from "@/lib/supabase/server";
+import { rateLimit } from "@/lib/rate-limit";
 
 // Force dynamic to prevent caching
 export const dynamic = "force-dynamic";
@@ -12,30 +13,6 @@ const PARTNER_URLS: Record<string, string> = {
   removal: "https://www.homeadvisor.com/c.Tree-Removal.html",
   health: "https://www.treesaregood.org/treeowner/caringforyourtrees",
 };
-
-// Rate limiting store (in-memory for now, would use Redis in production)
-const clickCounts = new Map<string, { count: number; resetAt: number }>();
-
-// Rate limit configuration
-const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
-const RATE_LIMIT_MAX = 10; // 10 clicks per minute per IP
-
-function isRateLimited(ip: string): boolean {
-  const now = Date.now();
-  const record = clickCounts.get(ip);
-
-  if (!record || now > record.resetAt) {
-    clickCounts.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
-    return false;
-  }
-
-  if (record.count >= RATE_LIMIT_MAX) {
-    return true;
-  }
-
-  record.count++;
-  return false;
-}
 
 // Bot detection patterns
 const BOT_PATTERNS = [
@@ -106,10 +83,10 @@ export async function GET(request: NextRequest) {
     }
 
     // Check rate limit (but still redirect)
-    const rateLimited = isRateLimited(ip);
+    const rateLimitResult = await rateLimit(`redirect:${ip}`, 10);
 
     // Log click (only if not rate limited)
-    if (!rateLimited) {
+    if (rateLimitResult.success) {
       // Save click to database
       try {
         const supabase = createAdminClient();

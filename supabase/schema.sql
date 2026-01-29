@@ -199,3 +199,37 @@ CREATE POLICY "Anyone can view reports by ID"
 CREATE POLICY "Service role can insert reports"
   ON reports FOR INSERT
   WITH CHECK (true);
+
+-- ===========================================
+-- ANALYTICS_EVENTS TABLE
+-- ===========================================
+-- Tracks user journey and conversion funnel
+
+CREATE TABLE IF NOT EXISTS analytics_events (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  event_type TEXT NOT NULL,
+  properties JSONB DEFAULT '{}',
+  session_id TEXT,
+  user_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
+  ip_address INET,
+  user_agent TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
+-- Create indexes for analytics queries
+CREATE INDEX IF NOT EXISTS idx_analytics_event_type ON analytics_events(event_type);
+CREATE INDEX IF NOT EXISTS idx_analytics_created_at ON analytics_events(created_at);
+CREATE INDEX IF NOT EXISTS idx_analytics_session_id ON analytics_events(session_id);
+
+-- Enable Row Level Security
+ALTER TABLE analytics_events ENABLE ROW LEVEL SECURITY;
+
+-- Service role can insert events (from API route)
+CREATE POLICY "Service role can insert events"
+  ON analytics_events FOR INSERT
+  WITH CHECK (true);
+
+-- Service role can read events (for dashboard)
+CREATE POLICY "Service role can read events"
+  ON analytics_events FOR SELECT
+  USING (true);
