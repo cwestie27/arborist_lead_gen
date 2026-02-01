@@ -41,7 +41,7 @@ export async function sendTreeReportEmail(
 
   try {
     const { error } = await resend.emails.send({
-      from: "TreeValue Pro <reports@treevalue.pro>",
+      from: "TreeValue Pro <reports@arborvalue.com>",
       to: [to],
       subject: `Your ${speciesName} Tree is Worth $${structuralValue.toLocaleString()}!`,
       html: generateEmailHtml({
@@ -260,7 +260,7 @@ export async function sendPropertyReportEmail(
 
   try {
     const { error } = await resend.emails.send({
-      from: "TreeValue Pro <reports@treevalue.pro>",
+      from: "TreeValue Pro <reports@arborvalue.com>",
       to: [to],
       subject: `Your Property ${treesText} Worth $${totalValue.toLocaleString()}!`,
       html: generatePropertyReportEmailHtml({
