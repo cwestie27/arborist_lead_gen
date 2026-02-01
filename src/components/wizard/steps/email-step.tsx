@@ -38,8 +38,18 @@ export function EmailStep() {
   const handleZipCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/\D/g, "").slice(0, 5);
     setLocalZipCode(value);
+
     if (value.length === 5) {
+      clearError("zipCode");
       setZipCode(value);
+    } else if (value.length > 0 && value.length < 5) {
+      setError("zipCode", "Please enter a valid 5-digit zip code");
+    }
+  };
+
+  const handleZipCodeBlur = () => {
+    if (localZipCode.length > 0 && localZipCode.length < 5) {
+      setError("zipCode", "Please enter a valid 5-digit zip code");
     }
   };
 
@@ -82,12 +92,14 @@ export function EmailStep() {
         />
 
         <Input
-          label="Zip Code (Optional)"
+          label="Zip Code"
           type="text"
           placeholder="12345"
           value={localZipCode}
           onChange={handleZipCodeChange}
-          hint="Helps us calculate regional pricing"
+          onBlur={handleZipCodeBlur}
+          error={errors.zipCode}
+          hint="Required for accurate regional pricing"
         />
       </div>
 

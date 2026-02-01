@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect, useRef } from "react";
 import {
   Heart,
   ThumbsUp,
@@ -11,9 +11,9 @@ import {
   Loader2,
   Check,
 } from "lucide-react";
-import { SelectionCard, PhotoUpload, Button } from "@/components/ui";
+import { SelectionCard, PhotoUpload } from "@/components/ui";
 import { useWizard } from "../wizard-context";
-import type { HealthCondition } from "@/types";
+import type { HealthCondition, PhotoUpload as PhotoUploadType } from "@/types";
 import { HEALTH_OPTIONS } from "@/lib/constants";
 
 const HEALTH_ICONS: Record<HealthCondition, React.ReactNode> = {
@@ -35,9 +35,16 @@ export function HealthStep() {
   } = useWizard();
 
   const [assessmentError, setAssessmentError] = useState<string | null>(null);
+  const lastAnalyzedPhotosRef = useRef<string>("");
 
-  const handleAssessHealth = useCallback(async () => {
-    if (currentTree.healthPhotos.length === 0) return;
+  const handleAssessHealth = useCallback(async (photos: PhotoUploadType[]) => {
+    if (photos.length === 0) return;
+
+    // Create a key from photo IDs to track what we've analyzed
+    const photosKey = photos.map(p => p.id).sort().join(",");
+
+    // Don't re-analyze if we already analyzed these exact photos
+    if (photosKey === lastAnalyzedPhotosRef.current) return;
 
     setIdentifying(true);
     setAssessmentError(null);
@@ -47,7 +54,7 @@ export function HealthStep() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          images: currentTree.healthPhotos.map((p) => p.base64),
+          images: photos.map((p) => p.base64),
           includeHealth: true,
         }),
       });
@@ -60,12 +67,13 @@ export function HealthStep() {
 
       if (data.healthAssessment) {
         setHealthAssessment(data.healthAssessment);
-        // Auto-select suggested condition
+        // Auto-select suggested condition from AI
         if (data.suggestedCondition) {
           setHealthCondition(data.suggestedCondition);
         }
+        lastAnalyzedPhotosRef.current = photosKey;
       } else {
-        setAssessmentError("Could not assess health. Please try different photos.");
+        setAssessmentError("Could not assess health. Please select condition manually.");
       }
     } catch (error) {
       setAssessmentError(
@@ -75,11 +83,17 @@ export function HealthStep() {
       setIdentifying(false);
     }
   }, [
-    currentTree.healthPhotos,
     setHealthAssessment,
     setHealthCondition,
     setIdentifying,
   ]);
+
+  // Auto-analyze when photos are added
+  useEffect(() => {
+    if (currentTree.healthPhotos.length > 0 && !isIdentifying && !currentTree.healthAssessment) {
+      handleAssessHealth(currentTree.healthPhotos);
+    }
+  }, [currentTree.healthPhotos, currentTree.healthAssessment, isIdentifying, handleAssessHealth]);
 
   return (
     <div className="space-y-6">
@@ -110,17 +124,10 @@ export function HealthStep() {
           isLoading={isIdentifying}
         />
 
-        {currentTree.healthPhotos.length > 0 && !currentTree.healthAssessment && (
-          <div className="mt-4">
-            <Button
-              onClick={handleAssessHealth}
-              disabled={isIdentifying}
-              variant="secondary"
-              className="w-full"
-              leftIcon={isIdentifying ? <Loader2 className="w-4 h-4 animate-spin" /> : undefined}
-            >
-              {isIdentifying ? "Analyzing..." : "Analyze Health"}
-            </Button>
+        {isIdentifying && (
+          <div className="mt-4 flex items-center justify-center gap-2 text-earth-600">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            <span className="text-sm">Analyzing health...</span>
           </div>
         )}
 

@@ -165,8 +165,9 @@ function validateCurrentStep(state: WizardState): boolean {
       return currentTree.location !== null;
     case 5: // Health
       return currentTree.healthCondition !== null;
-    case 6: // Email
-      return data.email !== null && isValidEmail(data.email);
+    case 6: // Email + Zip Code
+      return data.email !== null && isValidEmail(data.email) &&
+             data.zipCode !== null && data.zipCode.length === 5;
     default:
       return false;
   }

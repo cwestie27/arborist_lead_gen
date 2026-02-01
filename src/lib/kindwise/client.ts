@@ -111,6 +111,12 @@ export async function assessTreeHealth(
   const { apiKey } = config;
   const { latitude, longitude } = options || {};
 
+  // Build query params to request disease details
+  const params = new URLSearchParams();
+  params.set("details", "description,treatment");
+
+  const url = `${HEALTH_API_URL}?${params.toString()}`;
+
   // Build request body
   const body: KindwiseRequest = {
     images,
@@ -122,7 +128,7 @@ export async function assessTreeHealth(
     body.longitude = longitude;
   }
 
-  const response = await fetch(HEALTH_API_URL, {
+  const response = await fetch(url, {
     method: "POST",
     headers: {
       "Api-Key": apiKey,

@@ -92,12 +92,7 @@ function calculateStructuralValue(
   conditionRating: number,
   unitCost: number
 ): number {
-  let trunkArea = calculateTrunkArea(dbh);
-
-  // Apply large tree adjustment if DBH exceeds threshold
-  if (dbh > MAX_STANDARD_DBH) {
-    trunkArea = calculateAdjustedTrunkArea(trunkArea);
-  }
+  const trunkArea = calculateTrunkArea(dbh);
 
   // CTLA Formula: Area × Unit Cost × Species × Condition × Location
   const value =
