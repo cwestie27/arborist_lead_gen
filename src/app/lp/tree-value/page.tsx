@@ -10,6 +10,7 @@ import {
   Shield,
   Clock,
   Star,
+  Scan,
 } from "lucide-react";
 import { Button } from "@/components/ui";
 import { MetaEvents } from "@/components/MetaPixel";
@@ -99,6 +100,12 @@ function LandingPageContent() {
               <Shield className="w-4 h-4 text-forest-600" />
               No Credit Card
             </div>
+          </div>
+
+          {/* Health Risk Callout */}
+          <div className="inline-flex items-center gap-2 mt-6 px-4 py-2 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
+            <Scan className="w-4 h-4" />
+            <span>Plus: Free AI health assessment to spot disease &amp; hazards</span>
           </div>
         </div>
 
