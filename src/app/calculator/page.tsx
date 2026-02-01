@@ -97,6 +97,8 @@ function CalculatorContent() {
 export default function CalculatorPage() {
   return (
     <WizardProvider>
+      {/* SEO: Hidden H1 for accessibility and search engines */}
+      <h1 className="sr-only">Free Tree Value Calculator - Calculate Your Tree&apos;s Worth</h1>
       <CalculatorContent />
     </WizardProvider>
   );

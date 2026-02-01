@@ -170,8 +170,10 @@ export function PhotoUpload({
             <div key={photo.id} className="relative aspect-square">
               <img
                 src={`data:${photo.mimeType};base64,${photo.base64}`}
-                alt={photo.fileName}
+                alt={`Tree photo: ${photo.fileName}`}
                 className="w-full h-full object-cover rounded-lg border border-charcoal-200"
+                loading="lazy"
+                decoding="async"
               />
               <button
                 onClick={() => handleRemove(photo.id)}

@@ -7,7 +7,7 @@ const organizationSchema = {
   "@type": "Organization",
   name: "TreeValue Pro",
   url: siteUrl,
-  logo: `${siteUrl}/logo.png`,
+  logo: `${siteUrl}/logo.svg`,
   description:
     "Professional tree valuation calculator using CTLA appraisal methods. Get your tree's replacement value and annual ecosystem benefits.",
   sameAs: [],
@@ -105,6 +105,65 @@ const faqSchema = {
         text: "Our valuations provide excellent estimates for understanding your tree's worth, but insurance companies typically require a formal appraisal from a certified arborist. We can connect you with qualified arborists in your area who can provide official documentation.",
       },
     },
+    {
+      "@type": "Question",
+      name: "How do I measure my tree's girth (circumference)?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Tree girth is measured at 4.5 feet (breast height) above the ground. You can use a tape measure around the trunk, or use our simple comparison tool that lets you estimate based on everyday objects like paint buckets or arm spans.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What types of trees can be valued?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "TreeValue Pro can value any tree species including oaks, maples, pines, fruit trees, ornamental trees, and more. Our database includes species-specific ratings for hundreds of tree varieties found in North America.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "How does tree health affect the valuation?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Tree health significantly impacts value. A tree in excellent condition receives 100% of its calculated value, while poor health can reduce value by 50% or more. Our AI-powered health assessment can analyze photos of your tree to detect diseases and pest damage.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What is carbon sequestration and why does it matter?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Carbon sequestration is the process by which trees absorb CO2 from the atmosphere and store it as carbon in their wood, leaves, and roots. A mature tree can absorb 48 pounds of CO2 per year. This has real economic value as companies and governments pay to offset carbon emissions.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Can I value multiple trees at once?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes! TreeValue Pro supports multi-tree assessments. You can add multiple trees to get a complete property valuation with combined structural value and ecosystem benefits for all your trees.",
+      },
+    },
+  ],
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "Home",
+      item: siteUrl,
+    },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: "Tree Calculator",
+      item: `${siteUrl}/calculator`,
+    },
   ],
 };
 
@@ -126,6 +185,10 @@ export function StructuredData() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
     </>
   );

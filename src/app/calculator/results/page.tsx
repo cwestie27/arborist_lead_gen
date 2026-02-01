@@ -281,8 +281,52 @@ export default function ResultsPage() {
 
   if (isLoading || !data) {
     return (
-      <div className="min-h-screen bg-cream flex items-center justify-center">
-        <div className="animate-pulse text-charcoal-500">Loading results...</div>
+      <div className="min-h-screen bg-cream">
+        {/* Skeleton Header - matches final layout */}
+        <header className="bg-forest-700">
+          <div className="max-w-4xl mx-auto px-6 py-12 md:py-16 text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-forest-600 rounded-full mb-6">
+              <div className="w-4 h-4 bg-forest-400 rounded animate-pulse" />
+              <div className="w-32 h-4 bg-forest-400 rounded animate-pulse" />
+            </div>
+            <div className="h-10 md:h-12 bg-forest-500 rounded-lg w-64 mx-auto mb-4 animate-pulse" />
+            <div className="h-16 md:h-20 bg-forest-400 rounded-lg w-48 mx-auto mb-4 animate-pulse" />
+            <div className="h-4 bg-forest-500 rounded w-72 mx-auto animate-pulse" />
+          </div>
+        </header>
+
+        {/* Skeleton Content */}
+        <main className="max-w-4xl mx-auto px-6 py-12">
+          {/* Eco Impact Skeleton */}
+          <div className="bg-white rounded-xl shadow-sm mb-8 overflow-hidden">
+            <div className="bg-earth-50 p-6 border-b border-earth-100">
+              <div className="h-6 bg-earth-200 rounded w-48 animate-pulse" />
+              <div className="h-4 bg-earth-100 rounded w-64 mt-2 animate-pulse" />
+            </div>
+            <div className="grid md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-charcoal-100">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="p-6 flex flex-col items-center">
+                  <div className="w-12 h-12 bg-charcoal-100 rounded-full mb-3 animate-pulse" />
+                  <div className="h-3 bg-charcoal-100 rounded w-20 mb-2 animate-pulse" />
+                  <div className="h-8 bg-charcoal-200 rounded w-16 animate-pulse" />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Tree Card Skeleton */}
+          <div className="h-5 bg-charcoal-200 rounded w-32 mb-4 animate-pulse" />
+          <div className="bg-white rounded-xl shadow-sm p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-forest-100 rounded-full animate-pulse" />
+              <div className="flex-1">
+                <div className="h-4 bg-charcoal-200 rounded w-24 mb-2 animate-pulse" />
+                <div className="h-3 bg-charcoal-100 rounded w-32 animate-pulse" />
+              </div>
+              <div className="h-6 bg-forest-200 rounded w-20 animate-pulse" />
+            </div>
+          </div>
+        </main>
       </div>
     );
   }
