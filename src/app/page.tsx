@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { TreeDeciduous, Calculator, Mail, Shield, ArrowRight } from "lucide-react";
+import { TreeDeciduous, Calculator, Mail, Shield, ArrowRight, AlertTriangle, Scan } from "lucide-react";
 import { Button } from "@/components/ui";
 
 export default function Home() {
@@ -118,6 +118,83 @@ export default function Home() {
                 100% Free
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Risk Prevention Section */}
+      <section className="py-20 md:py-28 bg-amber-50">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="font-heading text-3xl md:text-4xl font-semibold text-charcoal-900 mb-4">
+              Don&apos;t Let Your Investment Become a Liability
+            </h2>
+            <p className="text-lg text-charcoal-600 max-w-2xl mx-auto">
+              A healthy tree adds thousands to your property value. A neglected
+              tree can cost you even more in damage, removal, and liability claims.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Card 1 - Storm Ready */}
+            <div className="bg-white rounded-2xl p-8 border border-amber-100">
+              <div className="w-14 h-14 bg-amber-100 rounded-xl flex items-center justify-center mb-6">
+                <AlertTriangle className="w-7 h-7 text-amber-600" />
+              </div>
+              <h3 className="font-heading text-xl font-semibold text-charcoal-900 mb-3">
+                Storm-Ready Trees
+              </h3>
+              <p className="text-charcoal-600 leading-relaxed">
+                Dead branches and weakened limbs are the first to fall during
+                storms. Early detection prevents costly damage to your home and
+                vehicles.
+              </p>
+              <p className="mt-4 text-2xl font-mono font-bold text-amber-600">
+                $3B+ annual storm damage
+              </p>
+            </div>
+
+            {/* Card 2 - Reduce Liability */}
+            <div className="bg-white rounded-2xl p-8 border border-amber-100">
+              <div className="w-14 h-14 bg-earth-100 rounded-xl flex items-center justify-center mb-6">
+                <Shield className="w-7 h-7 text-earth-600" />
+              </div>
+              <h3 className="font-heading text-xl font-semibold text-charcoal-900 mb-3">
+                Reduce Your Liability
+              </h3>
+              <p className="text-charcoal-600 leading-relaxed">
+                Homeowners can be held liable for damage from hazardous trees.
+                Document health status and address issues proactively.
+              </p>
+              <p className="mt-4 text-2xl font-mono font-bold text-earth-600">
+                $100K+ potential liability
+              </p>
+            </div>
+
+            {/* Card 3 - AI Health Check */}
+            <div className="bg-white rounded-2xl p-8 border border-amber-100">
+              <div className="w-14 h-14 bg-forest-100 rounded-xl flex items-center justify-center mb-6">
+                <Scan className="w-7 h-7 text-forest-700" />
+              </div>
+              <h3 className="font-heading text-xl font-semibold text-charcoal-900 mb-3">
+                AI-Powered Health Check
+              </h3>
+              <p className="text-charcoal-600 leading-relaxed">
+                Upload a photo and our AI instantly analyzes your tree for 30+
+                diseases and pest infestations. Catch problems early.
+              </p>
+              <p className="mt-4 text-2xl font-mono font-bold text-forest-700">
+                60 seconds to assess
+              </p>
+            </div>
+          </div>
+
+          <div className="text-center mt-12">
+            <Link href="/calculator">
+              <Button size="lg" rightIcon={<ArrowRight className="w-5 h-5" />}>
+                Check My Tree&apos;s Health Free
+              </Button>
+            </Link>
           </div>
         </div>
       </section>

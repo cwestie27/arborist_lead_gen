@@ -214,9 +214,9 @@ function LandingPageContent() {
                   ))}
                 </div>
                 <p className="text-charcoal-700 mb-2">
-                  &ldquo;I had no idea my oak tree was worth over $18,000! This helped me
-                  understand why proper tree care is so important. The report was
-                  incredibly detailed.&rdquo;
+                  &ldquo;I had no idea my oak tree was worth over $18,000! The health
+                  check also caught early signs of oak wilt I would have missed.
+                  This could have saved me thousands in removal costs.&rdquo;
                 </p>
                 <p className="text-sm text-charcoal-500">
                   — Jennifer M., Virginia
@@ -248,8 +248,8 @@ function LandingPageContent() {
               Don&apos;t Leave Money on the Table
             </h2>
             <p className="text-forest-100 mb-6 max-w-lg mx-auto">
-              Most homeowners have no idea what their trees are worth.
-              Get your free valuation now.
+              Most homeowners have no idea what their trees are worth—or when
+              they&apos;re at risk. Get your free valuation and health check now.
             </p>
             <Link href="/calculator">
               <Button

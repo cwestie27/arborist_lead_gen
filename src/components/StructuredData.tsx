@@ -145,6 +145,30 @@ const faqSchema = {
         text: "Yes! TreeValue Pro supports multi-tree assessments. You can add multiple trees to get a complete property valuation with combined structural value and ecosystem benefits for all your trees.",
       },
     },
+    {
+      "@type": "Question",
+      name: "Can TreeValue Pro help identify hazardous trees?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes! Our AI-powered health assessment analyzes photos of your tree to detect signs of disease, pest infestation, and structural issues that could make a tree hazardous. Early detection of problems like dead branches, fungal growth, or trunk decay helps you address issues before they become dangerous liabilities.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "How do trees become dangerous in storms?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Trees become storm hazards when they have dead or dying branches, fungal growth indicating internal decay, significant lean, co-dominant stems with included bark, root damage, or pest infestations that weaken the wood. These issues make trees more likely to drop limbs or fall entirely during high winds. Regular health assessments can identify these warning signs before storm damage occurs.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Am I liable if my tree damages a neighbor's property?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "In most jurisdictions, homeowners can be held liable for damage caused by their trees if they knew or should have known the tree was hazardous. This is why documenting your tree's health status is important. Regular health assessments help you identify and address potential hazards proactively, protecting both your property and your neighbors while reducing your liability exposure.",
+      },
+    },
   ],
 };
 
