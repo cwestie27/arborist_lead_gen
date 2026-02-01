@@ -99,7 +99,7 @@ export function EmailStep() {
           onChange={handleZipCodeChange}
           onBlur={handleZipCodeBlur}
           error={errors.zipCode}
-          hint="Required for accurate regional pricing"
+          hint="Required for accurate regional valuation"
         />
       </div>
 

@@ -207,21 +207,49 @@ export function healthToConditionRating(
 ): "excellent" | "good" | "fair" | "poor" | "critical" {
   const { isHealthy, healthProbability, diseases } = assessment;
 
-  // Check for severe diseases
-  const severeDisease = diseases.find((d) => d.probability > 0.7);
+  // Non-disease conditions to ignore (natural states, not actual problems)
+  const nonDiseaseConditions = [
+    "winter dormancy",
+    "dormancy",
+    "autumn colors",
+    "fall colors",
+    "seasonal change",
+    "natural aging",
+  ];
+
+  // Filter to only actual diseases (exclude natural conditions)
+  const actualDiseases = diseases.filter(
+    (d) => !nonDiseaseConditions.some((condition) =>
+      d.name.toLowerCase().includes(condition)
+    )
+  );
+
+  // If tree is healthy with high confidence, prioritize that
+  if (isHealthy && healthProbability > 0.8) {
+    // Only downgrade if there's a severe ACTUAL disease
+    const severeDisease = actualDiseases.find((d) => d.probability > 0.7);
+    if (severeDisease) {
+      return "poor"; // Downgrade but not critical since overall healthy
+    }
+
+    if (healthProbability > 0.9) {
+      return "excellent";
+    }
+    return "good";
+  }
+
+  // Tree is not healthy - check disease severity
+  const severeDisease = actualDiseases.find((d) => d.probability > 0.7);
   if (severeDisease) {
     return "critical";
   }
 
-  const moderateDisease = diseases.find((d) => d.probability > 0.4);
+  const moderateDisease = actualDiseases.find((d) => d.probability > 0.4);
   if (moderateDisease) {
     return "poor";
   }
 
   // Based on overall health probability
-  if (isHealthy && healthProbability > 0.9) {
-    return "excellent";
-  }
   if (isHealthy && healthProbability > 0.7) {
     return "good";
   }

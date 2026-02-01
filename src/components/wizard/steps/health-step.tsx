@@ -10,8 +10,10 @@ import {
   Camera,
   Loader2,
   Check,
+  Copy,
+  Info,
 } from "lucide-react";
-import { SelectionCard, PhotoUpload } from "@/components/ui";
+import { SelectionCard, PhotoUpload, Button } from "@/components/ui";
 import { useWizard } from "../wizard-context";
 import type { HealthCondition, PhotoUpload as PhotoUploadType } from "@/types";
 import { HEALTH_OPTIONS } from "@/lib/constants";
@@ -35,6 +37,7 @@ export function HealthStep() {
   } = useWizard();
 
   const [assessmentError, setAssessmentError] = useState<string | null>(null);
+  const [userHasManuallySelected, setUserHasManuallySelected] = useState(false);
   const lastAnalyzedPhotosRef = useRef<string>("");
 
   const handleAssessHealth = useCallback(async (photos: PhotoUploadType[]) => {
@@ -67,8 +70,9 @@ export function HealthStep() {
 
       if (data.healthAssessment) {
         setHealthAssessment(data.healthAssessment);
-        // Auto-select suggested condition from AI
-        if (data.suggestedCondition) {
+        // Auto-select suggested condition from AI (only if user hasn't manually selected)
+        if (data.suggestedCondition && !userHasManuallySelected) {
+          console.log("Setting health condition from API:", data.suggestedCondition);
           setHealthCondition(data.suggestedCondition);
         }
         lastAnalyzedPhotosRef.current = photosKey;
@@ -86,7 +90,21 @@ export function HealthStep() {
     setHealthAssessment,
     setHealthCondition,
     setIdentifying,
+    userHasManuallySelected,
   ]);
+
+  // Handle manual condition selection
+  const handleManualConditionSelect = (condition: HealthCondition) => {
+    setUserHasManuallySelected(true);
+    setHealthCondition(condition);
+  };
+
+  // Copy identification photos to health photos
+  const handleUseIdentificationPhotos = () => {
+    if (currentTree.identificationPhotos.length > 0) {
+      setHealthPhotos([...currentTree.identificationPhotos]);
+    }
+  };
 
   // Auto-analyze when photos are added
   useEffect(() => {
@@ -94,6 +112,10 @@ export function HealthStep() {
       handleAssessHealth(currentTree.healthPhotos);
     }
   }, [currentTree.healthPhotos, currentTree.healthAssessment, isIdentifying, handleAssessHealth]);
+
+  // Check if we have identification photos that could be reused
+  const hasIdentificationPhotos = currentTree.identificationPhotos.length > 0;
+  const hasHealthPhotos = currentTree.healthPhotos.length > 0;
 
   return (
     <div className="space-y-6">
@@ -115,12 +137,46 @@ export function HealthStep() {
           </h3>
         </div>
 
+        {/* Photo Tips */}
+        <div className="mb-4 p-3 bg-white rounded-lg border border-earth-100">
+          <div className="flex items-start gap-2">
+            <Info className="w-4 h-4 text-earth-600 mt-0.5 flex-shrink-0" />
+            <div className="text-sm text-charcoal-600">
+              <p className="font-medium text-charcoal-700 mb-1">Best photos for health assessment:</p>
+              <ul className="list-disc list-inside space-y-0.5 text-xs">
+                <li>Close-up of leaves showing color and texture</li>
+                <li>Trunk/bark showing any damage, fungi, or discoloration</li>
+                <li>Any dead branches, holes, or areas of concern</li>
+                <li>Well-lit photos in daylight work best</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* Option to use identification photos */}
+        {hasIdentificationPhotos && !hasHealthPhotos && (
+          <div className="mb-4">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handleUseIdentificationPhotos}
+              leftIcon={<Copy className="w-4 h-4" />}
+              className="w-full"
+            >
+              Use photo from tree identification
+            </Button>
+            <p className="text-xs text-charcoal-500 text-center mt-1">
+              Or upload different photos below
+            </p>
+          </div>
+        )}
+
         <PhotoUpload
           photos={currentTree.healthPhotos}
           onPhotosChange={setHealthPhotos}
           maxPhotos={3}
           title="Upload Health Photos"
-          description="Photos of leaves, trunk, or problem areas"
+          description="Close-ups of leaves, bark, or problem areas"
           isLoading={isIdentifying}
         />
 
@@ -216,7 +272,7 @@ export function HealthStep() {
               description={option.description}
               icon={HEALTH_ICONS[option.value]}
               selected={currentTree.healthCondition === option.value}
-              onClick={() => setHealthCondition(option.value)}
+              onClick={() => handleManualConditionSelect(option.value)}
               aria-label={`Select ${option.label} condition`}
             />
           ))}

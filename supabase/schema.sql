@@ -233,3 +233,38 @@ CREATE POLICY "Service role can insert events"
 CREATE POLICY "Service role can read events"
   ON analytics_events FOR SELECT
   USING (true);
+
+-- ===========================================
+-- SERVICE_INTERESTS TABLE
+-- ===========================================
+-- Tracks user interest in arborist/tree care services
+
+CREATE TABLE IF NOT EXISTS service_interests (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  service_type TEXT NOT NULL, -- 'arborist' or 'tree_care_quote'
+  email TEXT,
+  tree_value NUMERIC(12, 2),
+  zip_code TEXT,
+  ip_address INET,
+  user_agent TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
+-- Create indexes for queries
+CREATE INDEX IF NOT EXISTS idx_service_interests_type ON service_interests(service_type);
+CREATE INDEX IF NOT EXISTS idx_service_interests_created_at ON service_interests(created_at);
+CREATE INDEX IF NOT EXISTS idx_service_interests_email ON service_interests(email);
+CREATE INDEX IF NOT EXISTS idx_service_interests_zip ON service_interests(zip_code);
+
+-- Enable Row Level Security
+ALTER TABLE service_interests ENABLE ROW LEVEL SECURITY;
+
+-- Service role can insert interests (from API route)
+CREATE POLICY "Service role can insert interests"
+  ON service_interests FOR INSERT
+  WITH CHECK (true);
+
+-- Service role can read interests (for dashboard)
+CREATE POLICY "Service role can read interests"
+  ON service_interests FOR SELECT
+  USING (true);

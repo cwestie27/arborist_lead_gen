@@ -56,6 +56,12 @@ export async function POST(request: NextRequest) {
         healthAssessment = parseHealthAssessment(healthResponse);
         if (healthAssessment) {
           suggestedCondition = healthToConditionRating(healthAssessment);
+          console.log("Health assessment:", {
+            isHealthy: healthAssessment.isHealthy,
+            probability: healthAssessment.healthProbability,
+            diseases: healthAssessment.diseases.map(d => ({ name: d.name, prob: d.probability })),
+            suggestedCondition,
+          });
         }
       } catch (healthError) {
         // Health assessment failed but identification succeeded - continue

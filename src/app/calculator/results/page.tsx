@@ -10,13 +10,15 @@ import {
   Zap,
   ArrowRight,
   RotateCcw,
-  ExternalLink,
   ChevronDown,
   ChevronUp,
   Heart,
   Wind,
   Mail,
   CheckCircle,
+  Search,
+  FileText,
+  Loader2,
 } from "lucide-react";
 import { Button, Card, CardContent, TreeInfoCard } from "@/components/ui";
 import { formatCurrency } from "@/lib/utils";
@@ -25,17 +27,39 @@ import { MetaEvents } from "@/components/MetaPixel";
 import type { TreeSpeciesInfo } from "@/lib/tree-database";
 import type { PropertyValuation, TreeData, TreeValuation } from "@/types";
 
-// Generate tracked affiliate link
-function getTrackedLink(target: string, email: string | null): string {
-  // Track affiliate click in Meta Pixel
-  MetaEvents.affiliateClicked(target);
+// Record service interest to database
+async function recordServiceInterest(
+  serviceType: "arborist" | "tree_care_quote",
+  email: string | null,
+  treeValue: number,
+  zipCode: string | null
+): Promise<{ success: boolean; message: string }> {
+  // Track in Meta Pixel
+  MetaEvents.affiliateClicked(serviceType);
 
-  const params = new URLSearchParams({
-    target,
-    tree_id: "property",
-    ...(email && { uid: email }),
-  });
-  return `/api/redirect?${params.toString()}`;
+  try {
+    const response = await fetch("/api/service-interest", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        serviceType,
+        email,
+        treeValue,
+        zipCode,
+      }),
+    });
+
+    const data = await response.json();
+    return {
+      success: response.ok,
+      message: data.message || "Thank you for your interest!",
+    };
+  } catch {
+    return {
+      success: false,
+      message: "Something went wrong. Please try again.",
+    };
+  }
 }
 
 // Get display name for a tree
@@ -175,6 +199,119 @@ function TreeCard({
       {/* Tree Species Information */}
       {isExpanded && treeInfo && <TreeInfoCard treeInfo={treeInfo} />}
     </div>
+  );
+}
+
+// Service Interest CTA Component
+function ServiceInterestCTA({
+  email,
+  treeValue,
+  zipCode,
+}: {
+  email: string | null;
+  treeValue: number;
+  zipCode: string | null;
+}) {
+  const [arboristStatus, setArboristStatus] = useState<"idle" | "loading" | "success">("idle");
+  const [quoteStatus, setQuoteStatus] = useState<"idle" | "loading" | "success">("idle");
+  const [message, setMessage] = useState<string | null>(null);
+
+  const handleArboristClick = async () => {
+    if (arboristStatus !== "idle") return;
+    setArboristStatus("loading");
+
+    const result = await recordServiceInterest("arborist", email, treeValue, zipCode);
+    setArboristStatus("success");
+    setMessage(result.message);
+  };
+
+  const handleQuoteClick = async () => {
+    if (quoteStatus !== "idle") return;
+    setQuoteStatus("loading");
+
+    const result = await recordServiceInterest("tree_care_quote", email, treeValue, zipCode);
+    setQuoteStatus("success");
+    setMessage(result.message);
+  };
+
+  const bothSubmitted = arboristStatus === "success" && quoteStatus === "success";
+  const anySubmitted = arboristStatus === "success" || quoteStatus === "success";
+
+  return (
+    <Card className="bg-forest-50 border-forest-200">
+      <CardContent>
+        <div className="text-center">
+          <h2 className="font-heading text-xl font-semibold text-charcoal-900 mb-2">
+            Protect Your {formatCurrency(treeValue)} Asset
+          </h2>
+          <p className="text-charcoal-600 mb-6">
+            Regular professional care keeps your trees healthy and maintains
+            their value
+          </p>
+
+          {anySubmitted && message && (
+            <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <div className="flex items-center justify-center gap-2 text-green-700">
+                <CheckCircle className="w-5 h-5" />
+                <span className="font-medium">{message}</span>
+              </div>
+              {email && (
+                <p className="text-sm text-green-600 mt-1">
+                  We&apos;ll reach out to {email} soon.
+                </p>
+              )}
+            </div>
+          )}
+
+          {!bothSubmitted && (
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button
+                size="lg"
+                onClick={handleArboristClick}
+                disabled={arboristStatus !== "idle"}
+                leftIcon={
+                  arboristStatus === "loading" ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : arboristStatus === "success" ? (
+                    <CheckCircle className="w-4 h-4" />
+                  ) : (
+                    <Search className="w-4 h-4" />
+                  )
+                }
+              >
+                {arboristStatus === "success"
+                  ? "Request Submitted"
+                  : arboristStatus === "loading"
+                  ? "Submitting..."
+                  : "Find a Certified Arborist"}
+              </Button>
+
+              <Button
+                variant="secondary"
+                size="lg"
+                onClick={handleQuoteClick}
+                disabled={quoteStatus !== "idle"}
+                leftIcon={
+                  quoteStatus === "loading" ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : quoteStatus === "success" ? (
+                    <CheckCircle className="w-4 h-4" />
+                  ) : (
+                    <FileText className="w-4 h-4" />
+                  )
+                }
+              >
+                {quoteStatus === "success"
+                  ? "Request Submitted"
+                  : quoteStatus === "loading"
+                  ? "Submitting..."
+                  : "Get Tree Care Quote"}
+              </Button>
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -533,48 +670,11 @@ export default function ResultsPage() {
         )}
 
         {/* CTA Section */}
-        <Card className="bg-forest-50 border-forest-200">
-          <CardContent>
-            <div className="text-center">
-              <h2 className="font-heading text-xl font-semibold text-charcoal-900 mb-2">
-                Protect Your {formatCurrency(totals.structuralValue)} Asset
-              </h2>
-              <p className="text-charcoal-600 mb-6">
-                Regular professional care keeps your trees healthy and maintains
-                their value
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <a
-                  href={getTrackedLink("arborist", data.email)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Button
-                    size="lg"
-                    rightIcon={<ExternalLink className="w-4 h-4" />}
-                  >
-                    Find a Certified Arborist
-                  </Button>
-                </a>
-
-                <a
-                  href={getTrackedLink("pruning", data.email)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Button
-                    variant="secondary"
-                    size="lg"
-                    rightIcon={<ExternalLink className="w-4 h-4" />}
-                  >
-                    Get Tree Care Quote
-                  </Button>
-                </a>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <ServiceInterestCTA
+          email={data.email}
+          treeValue={totals.structuralValue}
+          zipCode={data.zipCode}
+        />
 
         {/* Footer Actions */}
         <div className="flex items-center justify-between mt-8 pt-8 border-t border-charcoal-200">
