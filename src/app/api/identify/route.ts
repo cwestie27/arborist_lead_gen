@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
   identifyTree,
+  assessTreeHealth,
   parseIdentificationResult,
   parseHealthAssessment,
   healthToConditionRating,
@@ -41,27 +42,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Call Kindwise API
-    const response = await identifyTree(validImages, { apiKey }, { includeHealth });
+    // Call Kindwise identification API
+    const identificationResponse = await identifyTree(validImages, { apiKey });
+    const identification = parseIdentificationResult(identificationResponse);
 
-    // Parse results
-    const identification = parseIdentificationResult(response);
-    const healthAssessment = includeHealth
-      ? parseHealthAssessment(response)
-      : null;
+    // Call health assessment API separately if requested
+    let healthAssessment = null;
+    let suggestedCondition = null;
 
-    // Determine suggested condition if health assessment available
-    const suggestedCondition = healthAssessment
-      ? healthToConditionRating(healthAssessment)
-      : null;
+    if (includeHealth) {
+      try {
+        const healthResponse = await assessTreeHealth(validImages, { apiKey });
+        healthAssessment = parseHealthAssessment(healthResponse);
+        if (healthAssessment) {
+          suggestedCondition = healthToConditionRating(healthAssessment);
+        }
+      } catch (healthError) {
+        // Health assessment failed but identification succeeded - continue
+        console.error("Health assessment error:", healthError);
+      }
+    }
 
     return NextResponse.json({
       success: true,
       identification,
       healthAssessment,
       suggestedCondition,
-      isPlant: response.result?.is_plant?.binary ?? false,
-      plantProbability: response.result?.is_plant?.probability ?? 0,
+      isPlant: identificationResponse.result?.is_plant?.binary ?? false,
+      plantProbability: identificationResponse.result?.is_plant?.probability ?? 0,
     });
   } catch (error) {
     console.error("Identification error:", error);

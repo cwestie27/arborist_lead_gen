@@ -10,35 +10,32 @@ import type {
   KindwiseHealthAssessment,
 } from "@/types";
 
-const KINDWISE_API_URL = "https://plant.id/api/v3/identification";
+const IDENTIFICATION_API_URL = "https://plant.id/api/v3/identification";
+const HEALTH_API_URL = "https://plant.id/api/v3/health_assessment";
 
 interface KindwiseClientConfig {
   apiKey: string;
 }
 
 /**
- * Call the Kindwise plant.id API for tree identification and health assessment
+ * Call the Kindwise plant.id API for tree identification
  */
 export async function identifyTree(
   images: string[],
   config: KindwiseClientConfig,
   options?: {
-    includeHealth?: boolean;
     latitude?: number;
     longitude?: number;
   }
 ): Promise<KindwiseResponse> {
   const { apiKey } = config;
-  const { includeHealth = true, latitude, longitude } = options || {};
+  const { latitude, longitude } = options || {};
 
-  // Build query params
+  // Build query params for identification details
   const params = new URLSearchParams();
   params.set("details", "common_names,taxonomy,description");
-  if (includeHealth) {
-    params.set("health", "all");
-  }
 
-  const url = `${KINDWISE_API_URL}?${params.toString()}`;
+  const url = `${IDENTIFICATION_API_URL}?${params.toString()}`;
 
   // Build request body
   const body: KindwiseRequest = {
@@ -63,6 +60,80 @@ export async function identifyTree(
   if (!response.ok) {
     const errorText = await response.text();
     throw new Error(`Kindwise API error: ${response.status} - ${errorText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Health assessment response structure (different from identification)
+ */
+interface HealthAssessmentResponse {
+  result: {
+    is_healthy: {
+      binary: boolean;
+      probability: number;
+    };
+    is_plant: {
+      binary: boolean;
+      probability: number;
+    };
+    disease: {
+      suggestions: Array<{
+        id: string;
+        name: string;
+        probability: number;
+        similar_images?: Array<{ url: string }>;
+        details?: {
+          description?: string;
+          treatment?: {
+            prevention?: string[];
+            biological?: string[];
+            chemical?: string[];
+          };
+        };
+      }>;
+    };
+  };
+}
+
+/**
+ * Call the Kindwise plant.id API for health assessment
+ */
+export async function assessTreeHealth(
+  images: string[],
+  config: KindwiseClientConfig,
+  options?: {
+    latitude?: number;
+    longitude?: number;
+  }
+): Promise<HealthAssessmentResponse> {
+  const { apiKey } = config;
+  const { latitude, longitude } = options || {};
+
+  // Build request body
+  const body: KindwiseRequest = {
+    images,
+    similar_images: true,
+  };
+
+  if (latitude !== undefined && longitude !== undefined) {
+    body.latitude = latitude;
+    body.longitude = longitude;
+  }
+
+  const response = await fetch(HEALTH_API_URL, {
+    method: "POST",
+    headers: {
+      "Api-Key": apiKey,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Kindwise Health API error: ${response.status} - ${errorText}`);
   }
 
   return response.json();
@@ -97,27 +168,27 @@ export function parseIdentificationResult(
  * Parse health assessment results into our simplified format
  */
 export function parseHealthAssessment(
-  response: KindwiseResponse
+  response: HealthAssessmentResponse
 ): KindwiseHealthAssessment | null {
-  const healthAssessment = response.result?.health_assessment;
-  if (!healthAssessment) {
+  const result = response.result;
+  if (!result?.is_healthy) {
     return null;
   }
 
-  const diseases = (healthAssessment.diseases || []).map((disease) => ({
+  const diseases = (result.disease?.suggestions || []).map((disease) => ({
     name: disease.name,
     probability: disease.probability,
-    description: disease.disease_details?.description,
+    description: disease.details?.description,
     treatment: [
-      ...(disease.disease_details?.treatment?.prevention || []),
-      ...(disease.disease_details?.treatment?.biological || []),
-      ...(disease.disease_details?.treatment?.chemical || []),
+      ...(disease.details?.treatment?.prevention || []),
+      ...(disease.details?.treatment?.biological || []),
+      ...(disease.details?.treatment?.chemical || []),
     ].join(" "),
   }));
 
   return {
-    isHealthy: healthAssessment.is_healthy.binary,
-    healthProbability: healthAssessment.is_healthy.probability,
+    isHealthy: result.is_healthy.binary,
+    healthProbability: result.is_healthy.probability,
     diseases,
   };
 }
