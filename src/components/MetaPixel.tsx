@@ -6,12 +6,46 @@ import { useEffect } from "react";
 
 const PIXEL_ID = "886836400756092";
 
+// Session ID for analytics tracking
+let sessionId: string | null = null;
+function getSessionId(): string {
+  if (typeof window === "undefined") return "";
+  if (!sessionId) {
+    sessionId = sessionStorage.getItem("analytics_session_id");
+    if (!sessionId) {
+      sessionId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+      sessionStorage.setItem("analytics_session_id", sessionId);
+    }
+  }
+  return sessionId;
+}
+
 // Declare fbq for TypeScript
 declare global {
   interface Window {
     fbq: (...args: unknown[]) => void;
     _fbq: (...args: unknown[]) => void;
   }
+}
+
+/**
+ * Track to our own analytics API
+ */
+function trackToDatabase(eventName: string, properties?: Record<string, unknown>) {
+  if (typeof window === "undefined") return;
+
+  // Fire and forget - don't block UI
+  fetch("/api/analytics", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      event: eventName,
+      properties,
+      sessionId: getSessionId(),
+    }),
+  }).catch(() => {
+    // Silently fail - analytics shouldn't break the app
+  });
 }
 
 /**
@@ -39,30 +73,59 @@ export function trackMetaCustomEvent(
 }
 
 // Pre-defined event helpers for the conversion funnel
+// Tracks to both Meta Pixel AND our own database
 export const MetaEvents = {
   // Standard events
-  pageView: () => trackMetaEvent("PageView"),
-  viewContent: (contentName?: string) =>
-    trackMetaEvent("ViewContent", { content_name: contentName }),
-  lead: (value?: number) =>
-    trackMetaEvent("Lead", value ? { value, currency: "USD" } : undefined),
-  completeRegistration: (value?: number) =>
-    trackMetaEvent("CompleteRegistration", value ? { value, currency: "USD" } : undefined),
+  pageView: () => {
+    trackMetaEvent("PageView");
+    trackToDatabase("page_view");
+  },
+  viewContent: (contentName?: string) => {
+    trackMetaEvent("ViewContent", { content_name: contentName });
+    trackToDatabase("view_content", { content_name: contentName });
+  },
+  lead: (value?: number) => {
+    trackMetaEvent("Lead", value ? { value, currency: "USD" } : undefined);
+    trackToDatabase("lead", { value });
+  },
+  completeRegistration: (value?: number) => {
+    trackMetaEvent("CompleteRegistration", value ? { value, currency: "USD" } : undefined);
+    trackToDatabase("complete_registration", { value });
+  },
 
   // Custom events for our funnel
-  wizardStarted: () => trackMetaCustomEvent("WizardStarted"),
-  wizardStepCompleted: (step: string) =>
-    trackMetaCustomEvent("WizardStepCompleted", { step }),
-  emailCaptured: () => trackMetaCustomEvent("EmailCaptured"),
-  valuationCompleted: (structuralValue: number, ecoValue: number) =>
+  wizardStarted: () => {
+    trackMetaCustomEvent("WizardStarted");
+    trackToDatabase("wizard_started");
+  },
+  wizardStepCompleted: (step: string) => {
+    trackMetaCustomEvent("WizardStepCompleted", { step });
+    trackToDatabase("wizard_step_completed", { step });
+  },
+  emailCaptured: () => {
+    trackMetaCustomEvent("EmailCaptured");
+    trackToDatabase("email_captured");
+  },
+  valuationCompleted: (structuralValue: number, ecoValue: number) => {
     trackMetaCustomEvent("ValuationCompleted", {
       structural_value: structuralValue,
       eco_value: ecoValue,
       total_value: structuralValue + ecoValue,
-    }),
-  reportViewed: () => trackMetaCustomEvent("ReportViewed"),
-  affiliateClicked: (target: string) =>
-    trackMetaCustomEvent("AffiliateClicked", { target }),
+    });
+    trackToDatabase("valuation_completed", {
+      structural_value: structuralValue,
+      eco_value: ecoValue,
+      total_value: structuralValue + ecoValue,
+    });
+  },
+  reportViewed: () => {
+    trackMetaCustomEvent("ReportViewed");
+    trackToDatabase("report_viewed");
+  },
+  affiliateClicked: (target: string) => {
+    trackMetaCustomEvent("AffiliateClicked", { target });
+    trackToDatabase("affiliate_clicked", { target });
+  },
 };
 
 /**
