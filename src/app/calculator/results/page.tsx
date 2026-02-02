@@ -32,7 +32,11 @@ async function recordServiceInterest(
   serviceType: "arborist" | "tree_care_quote",
   email: string | null,
   treeValue: number,
-  zipCode: string | null
+  zipCode: string | null,
+  address: string | null,
+  reportId: string | null,
+  treeCount: number,
+  hasHealthIssues: boolean
 ): Promise<{ success: boolean; message: string }> {
   // Track in Meta Pixel
   MetaEvents.affiliateClicked(serviceType);
@@ -46,6 +50,10 @@ async function recordServiceInterest(
         email,
         treeValue,
         zipCode,
+        address,
+        reportId,
+        treeCount,
+        hasHealthIssues,
       }),
     });
 
@@ -207,10 +215,18 @@ function ServiceInterestCTA({
   email,
   treeValue,
   zipCode,
+  address,
+  reportId,
+  treeCount,
+  hasHealthIssues,
 }: {
   email: string | null;
   treeValue: number;
   zipCode: string | null;
+  address: string | null;
+  reportId: string | null;
+  treeCount: number;
+  hasHealthIssues: boolean;
 }) {
   const [arboristStatus, setArboristStatus] = useState<"idle" | "loading" | "success">("idle");
   const [quoteStatus, setQuoteStatus] = useState<"idle" | "loading" | "success">("idle");
@@ -220,7 +236,7 @@ function ServiceInterestCTA({
     if (arboristStatus !== "idle") return;
     setArboristStatus("loading");
 
-    const result = await recordServiceInterest("arborist", email, treeValue, zipCode);
+    const result = await recordServiceInterest("arborist", email, treeValue, zipCode, address, reportId, treeCount, hasHealthIssues);
     setArboristStatus("success");
     setMessage(result.message);
   };
@@ -229,7 +245,7 @@ function ServiceInterestCTA({
     if (quoteStatus !== "idle") return;
     setQuoteStatus("loading");
 
-    const result = await recordServiceInterest("tree_care_quote", email, treeValue, zipCode);
+    const result = await recordServiceInterest("tree_care_quote", email, treeValue, zipCode, address, reportId, treeCount, hasHealthIssues);
     setQuoteStatus("success");
     setMessage(result.message);
   };
@@ -674,6 +690,14 @@ export default function ResultsPage() {
           email={data.email}
           treeValue={totals.structuralValue}
           zipCode={data.zipCode}
+          address={data.address}
+          reportId={reportId}
+          treeCount={totals.treeCount}
+          hasHealthIssues={trees.some(t =>
+            t.healthCondition === "poor" ||
+            t.healthCondition === "critical" ||
+            (t.healthAssessment?.diseases?.some(d => d.probability > 0.5))
+          )}
         />
 
         {/* Footer Actions */}

@@ -41,9 +41,9 @@ export async function sendTreeReportEmail(
 
   try {
     const { error } = await resend.emails.send({
-      from: "TreeValue Pro <reports@arborvalue.com>",
+      from: "Arbor Value <reports@arborvalue.com>",
       to: [to],
-      subject: `Your ${speciesName} Tree is Worth $${structuralValue.toLocaleString()}!`,
+      subject: `Your ${speciesName} Tree is Worth $${structuralValue.toLocaleString()}`,
       html: generateEmailHtml({
         structuralValue,
         ecoValue,
@@ -96,7 +96,7 @@ function generateEmailHtml(params: EmailHtmlParams): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Your Tree Valuation Report</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #fafaf5;">
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #fafaf5;">
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #fafaf5;">
     <tr>
       <td align="center" style="padding: 40px 20px;">
@@ -109,7 +109,7 @@ function generateEmailHtml(params: EmailHtmlParams): string {
                 Your Tree Wealth Report
               </h1>
               <p style="margin: 0; color: #bbf7d0; font-size: 16px;">
-                TreeValue Pro Valuation Certificate
+                Arbor Value Valuation Certificate
               </p>
             </td>
           </tr>
@@ -120,7 +120,7 @@ function generateEmailHtml(params: EmailHtmlParams): string {
               <p style="margin: 0 0 8px 0; color: #71717a; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
                 Your ${speciesName} Tree is Worth
               </p>
-              <p style="margin: 0; color: #15803d; font-size: 48px; font-weight: 700; font-family: 'Courier New', monospace;">
+              <p style="margin: 0; color: #15803d; font-size: 48px; font-weight: 700; font-family: Consolas, Monaco, 'Courier New', monospace;">
                 $${structuralValue.toLocaleString()}
               </p>
               <p style="margin: 16px 0 0 0; color: #71717a; font-size: 14px;">
@@ -138,7 +138,7 @@ function generateEmailHtml(params: EmailHtmlParams): string {
                     <p style="margin: 0 0 8px 0; color: #15803d; font-size: 14px; font-weight: 600;">
                       Annual Ecosystem Benefits
                     </p>
-                    <p style="margin: 0; color: #166534; font-size: 28px; font-weight: 700; font-family: 'Courier New', monospace;">
+                    <p style="margin: 0; color: #166534; font-size: 28px; font-weight: 700; font-family: Consolas, Monaco, 'Courier New', monospace;">
                       $${ecoValue.toLocaleString()}/year
                     </p>
                     <p style="margin: 8px 0 0 0; color: #15803d; font-size: 13px;">
@@ -260,9 +260,9 @@ export async function sendPropertyReportEmail(
 
   try {
     const { error } = await resend.emails.send({
-      from: "TreeValue Pro <reports@arborvalue.com>",
+      from: "Arbor Value <reports@arborvalue.com>",
       to: [to],
-      subject: `Your Property ${treesText} Worth $${totalValue.toLocaleString()}!`,
+      subject: `Your Property's ${treesText} Worth $${totalValue.toLocaleString()}`,
       html: generatePropertyReportEmailHtml({
         totalValue,
         treeCount,
@@ -327,7 +327,7 @@ function generatePropertyReportEmailHtml(params: PropertyReportEmailHtmlParams):
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Your Property Tree Report</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #fafaf5;">
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #fafaf5;">
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #fafaf5;">
     <tr>
       <td align="center" style="padding: 40px 20px;">
@@ -340,7 +340,7 @@ function generatePropertyReportEmailHtml(params: PropertyReportEmailHtmlParams):
                 Your Property Tree Report
               </h1>
               <p style="margin: 0; color: #bbf7d0; font-size: 16px;">
-                TreeValue Pro Valuation Certificate
+                Arbor Value Valuation Certificate
               </p>
             </td>
           </tr>
@@ -351,7 +351,7 @@ function generatePropertyReportEmailHtml(params: PropertyReportEmailHtmlParams):
               <p style="margin: 0 0 8px 0; color: #71717a; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
                 Your ${treeCount} ${treeWord} ${treeCount === 1 ? 'is' : 'are'} Worth
               </p>
-              <p style="margin: 0; color: #15803d; font-size: 48px; font-weight: 700; font-family: 'Courier New', monospace;">
+              <p style="margin: 0; color: #15803d; font-size: 48px; font-weight: 700; font-family: Consolas, Monaco, 'Courier New', monospace;">
                 $${totalValue.toLocaleString()}
               </p>
               <p style="margin: 16px 0 0 0; color: #71717a; font-size: 14px;">
@@ -369,7 +369,7 @@ function generatePropertyReportEmailHtml(params: PropertyReportEmailHtmlParams):
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                 <tr>
                   <td width="33%" style="text-align: center; padding: 10px;">
-                    <p style="margin: 0; color: #166534; font-size: 24px; font-weight: 700; font-family: 'Courier New', monospace;">
+                    <p style="margin: 0; color: #166534; font-size: 24px; font-weight: 700; font-family: Consolas, Monaco, 'Courier New', monospace;">
                       ${carbonLbsPerYear.toLocaleString()}
                     </p>
                     <p style="margin: 4px 0 0 0; color: #15803d; font-size: 12px;">
@@ -377,7 +377,7 @@ function generatePropertyReportEmailHtml(params: PropertyReportEmailHtmlParams):
                     </p>
                   </td>
                   <td width="33%" style="text-align: center; padding: 10px; border-left: 1px solid #bbf7d0; border-right: 1px solid #bbf7d0;">
-                    <p style="margin: 0; color: #166534; font-size: 24px; font-weight: 700; font-family: 'Courier New', monospace;">
+                    <p style="margin: 0; color: #166534; font-size: 24px; font-weight: 700; font-family: Consolas, Monaco, 'Courier New', monospace;">
                       ${stormwaterGallonsPerYear.toLocaleString()}
                     </p>
                     <p style="margin: 4px 0 0 0; color: #15803d; font-size: 12px;">
@@ -385,7 +385,7 @@ function generatePropertyReportEmailHtml(params: PropertyReportEmailHtmlParams):
                     </p>
                   </td>
                   <td width="33%" style="text-align: center; padding: 10px;">
-                    <p style="margin: 0; color: #166534; font-size: 24px; font-weight: 700; font-family: 'Courier New', monospace;">
+                    <p style="margin: 0; color: #166534; font-size: 24px; font-weight: 700; font-family: Consolas, Monaco, 'Courier New', monospace;">
                       $${annualEcoValue.toLocaleString()}
                     </p>
                     <p style="margin: 4px 0 0 0; color: #15803d; font-size: 12px;">

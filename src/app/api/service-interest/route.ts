@@ -7,11 +7,24 @@ export const dynamic = "force-dynamic";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { serviceType, email, treeValue, zipCode } = body as {
+    const {
+      serviceType,
+      email,
+      treeValue,
+      zipCode,
+      address,
+      reportId,
+      treeCount,
+      hasHealthIssues,
+    } = body as {
       serviceType: "arborist" | "tree_care_quote";
       email?: string;
       treeValue?: number;
       zipCode?: string;
+      address?: string;
+      reportId?: string;
+      treeCount?: number;
+      hasHealthIssues?: boolean;
     };
 
     if (!serviceType) {
@@ -34,8 +47,12 @@ export async function POST(request: NextRequest) {
     const { error } = await supabase.from("service_interests").insert({
       service_type: serviceType,
       email: email || null,
+      address: address || null,
       tree_value: treeValue || null,
       zip_code: zipCode || null,
+      report_id: reportId || null,
+      tree_count: treeCount || null,
+      has_health_issues: hasHealthIssues || false,
       ip_address: ip,
       user_agent: userAgent,
     });

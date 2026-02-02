@@ -63,6 +63,7 @@ function CalculatorContent() {
           treeCount: valuatedTrees.length,
         },
         email: data.email,
+        address: data.address,
         zipCode: data.zipCode,
         createdAt: new Date().toISOString(),
       };

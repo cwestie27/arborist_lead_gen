@@ -243,10 +243,16 @@ CREATE TABLE IF NOT EXISTS service_interests (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   service_type TEXT NOT NULL, -- 'arborist' or 'tree_care_quote'
   email TEXT,
+  address TEXT,
   tree_value NUMERIC(12, 2),
   zip_code TEXT,
+  report_id UUID REFERENCES reports(id) ON DELETE SET NULL,
+  tree_count INTEGER,
+  has_health_issues BOOLEAN DEFAULT FALSE,
   ip_address INET,
   user_agent TEXT,
+  status TEXT DEFAULT 'new', -- 'new', 'contacted', 'converted', 'closed'
+  notes TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
 

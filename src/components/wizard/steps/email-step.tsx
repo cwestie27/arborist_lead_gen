@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, Lock } from "lucide-react";
+import { Mail, Lock, MapPin } from "lucide-react";
 import { Input } from "@/components/ui";
 import { useWizard } from "../wizard-context";
 
 export function EmailStep() {
-  const { data, setEmail, setZipCode, errors, setError, clearError } = useWizard();
+  const { data, setEmail, setAddress, setZipCode, errors, setError, clearError } = useWizard();
   const [localEmail, setLocalEmail] = useState(data.email || "");
+  const [localAddress, setLocalAddress] = useState(data.address || "");
   const [localZipCode, setLocalZipCode] = useState(data.zipCode || "");
 
   const validateEmail = (email: string): boolean => {
@@ -32,6 +33,24 @@ export function EmailStep() {
   const handleEmailBlur = () => {
     if (localEmail && validateEmail(localEmail)) {
       setEmail(localEmail);
+    }
+  };
+
+  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setLocalAddress(value);
+
+    if (value.trim().length >= 5) {
+      clearError("address");
+      setAddress(value);
+    } else if (value.length > 0 && value.trim().length < 5) {
+      setError("address", "Please enter your full street address");
+    }
+  };
+
+  const handleAddressBlur = () => {
+    if (localAddress.trim().length > 0 && localAddress.trim().length < 5) {
+      setError("address", "Please enter your full street address");
     }
   };
 
@@ -89,6 +108,17 @@ export function EmailStep() {
           onBlur={handleEmailBlur}
           error={errors.email}
           hint="We'll send your Tree Wealth Report here"
+        />
+
+        <Input
+          label="Property Address"
+          type="text"
+          placeholder="123 Main Street"
+          value={localAddress}
+          onChange={handleAddressChange}
+          onBlur={handleAddressBlur}
+          error={errors.address}
+          hint="Required for accurate property assessment"
         />
 
         <Input

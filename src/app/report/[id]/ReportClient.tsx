@@ -179,7 +179,7 @@ interface ReportClientProps {
 
 export function ReportClient({ data, reportId }: ReportClientProps) {
   const [shareSuccess, setShareSuccess] = useState(false);
-  const [expandedTrees, setExpandedTrees] = useState<Set<number>>(new Set());
+  const [expandedTrees, setExpandedTrees] = useState<Set<number>>(new Set([0]));
 
   // Safely extract data with defaults for missing fields
   const trees = data?.trees || [];

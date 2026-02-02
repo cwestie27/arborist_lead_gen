@@ -64,17 +64,19 @@ export async function GET(request: NextRequest) {
         {/* Species */}
         <div
           style={{
+            display: "flex",
             fontSize: "28px",
             color: "#dcfce7",
             marginBottom: "16px",
           }}
         >
-          Your {species} is worth
+          {`Your ${species} is worth`}
         </div>
 
         {/* Main Value */}
         <div
           style={{
+            display: "flex",
             fontSize: "96px",
             fontWeight: "700",
             color: "#ffffff",
@@ -82,7 +84,7 @@ export async function GET(request: NextRequest) {
             fontFamily: "monospace",
           }}
         >
-          ${value}
+          {`$${value}`}
         </div>
 
         {/* Eco Value Box */}
@@ -112,20 +114,21 @@ export async function GET(request: NextRequest) {
               fontFamily: "monospace",
             }}
           >
-            ${ecoValue}/yr
+            {`$${ecoValue}/yr`}
           </span>
         </div>
 
         {/* Footer */}
         <div
           style={{
+            display: "flex",
             position: "absolute",
             bottom: "32px",
             fontSize: "18px",
             color: "#bbf7d0",
           }}
         >
-          CTLA Trunk Formula Method | treevalue.pro
+          CTLA Trunk Formula Method | arborvalue.com
         </div>
       </div>
     ),

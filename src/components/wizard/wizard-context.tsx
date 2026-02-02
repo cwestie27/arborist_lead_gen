@@ -41,6 +41,7 @@ type WizardAction =
   | { type: "SET_LOCATION"; payload: LocationType }
   | { type: "SET_HEALTH_CONDITION"; payload: HealthCondition }
   | { type: "SET_EMAIL"; payload: string }
+  | { type: "SET_ADDRESS"; payload: string }
   | { type: "SET_ZIP_CODE"; payload: string }
   | { type: "SET_IDENTIFICATION_PHOTOS"; payload: PhotoUpload[] }
   | { type: "SET_HEALTH_PHOTOS"; payload: PhotoUpload[] }
@@ -82,6 +83,7 @@ interface WizardContextValue extends WizardState {
 
   // Global actions
   setEmail: (email: string) => void;
+  setAddress: (address: string) => void;
   setZipCode: (zipCode: string) => void;
   nextStep: () => void;
   prevStep: () => void;
@@ -126,6 +128,7 @@ const initialState: WizardState = {
     trees: [createEmptyTree()],
     currentTreeIndex: 0,
     email: null,
+    address: null,
     zipCode: null,
   },
   isComplete: false,
@@ -165,8 +168,9 @@ function validateCurrentStep(state: WizardState): boolean {
       return currentTree.location !== null;
     case 5: // Health
       return currentTree.healthCondition !== null;
-    case 6: // Email + Zip Code
+    case 6: // Email + Address + Zip Code
       return data.email !== null && isValidEmail(data.email) &&
+             data.address !== null && data.address.trim().length >= 5 &&
              data.zipCode !== null && data.zipCode.length === 5;
     default:
       return false;
@@ -239,6 +243,12 @@ function wizardReducer(state: WizardState, action: WizardAction): WizardState {
       return {
         ...state,
         data: { ...state.data, email: action.payload },
+      };
+
+    case "SET_ADDRESS":
+      return {
+        ...state,
+        data: { ...state.data, address: action.payload },
       };
 
     case "SET_ZIP_CODE":
@@ -413,6 +423,10 @@ export function WizardProvider({ children, initialData }: WizardProviderProps) {
     dispatch({ type: "SET_EMAIL", payload: email });
   }, []);
 
+  const setAddress = useCallback((address: string) => {
+    dispatch({ type: "SET_ADDRESS", payload: address });
+  }, []);
+
   const setZipCode = useCallback((zipCode: string) => {
     dispatch({ type: "SET_ZIP_CODE", payload: zipCode });
   }, []);
@@ -470,6 +484,7 @@ export function WizardProvider({ children, initialData }: WizardProviderProps) {
       removeTree,
       selectTree,
       setEmail,
+      setAddress,
       setZipCode,
       nextStep,
       prevStep,
@@ -503,6 +518,7 @@ export function WizardProvider({ children, initialData }: WizardProviderProps) {
       removeTree,
       selectTree,
       setEmail,
+      setAddress,
       setZipCode,
       nextStep,
       prevStep,

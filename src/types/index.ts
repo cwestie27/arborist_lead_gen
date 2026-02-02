@@ -99,6 +99,7 @@ export interface WizardData {
   trees: TreeData[];
   currentTreeIndex: number;
   email: string | null;
+  address: string | null;
   zipCode: string | null;
   propertyName?: string;
 }
@@ -140,6 +141,7 @@ export interface PropertyValuation {
     treeCount: number;
   };
   email: string | null;
+  address: string | null;
   zipCode: string | null;
   createdAt: string;
 }
