@@ -4,7 +4,7 @@ import Script from "next/script";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
-const PIXEL_ID = "886836400756092";
+const PIXEL_ID = "789674546740065";
 
 // Session ID for analytics tracking
 let sessionId: string | null = null;
