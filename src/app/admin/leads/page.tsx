@@ -219,13 +219,13 @@ export default function LeadsPage() {
                       </td>
                       <td className="px-4 py-3">
                         {lead.email ? (
-                          <a
-                            href={`mailto:${lead.email}`}
+                          <Link
+                            href={`/admin/leads/${encodeURIComponent(lead.email)}`}
                             className="flex items-center gap-2 text-sm text-forest-600 hover:underline"
                           >
                             <Mail className="w-4 h-4" />
                             {lead.email}
-                          </a>
+                          </Link>
                         ) : (
                           <span className="text-sm text-charcoal-400">No email</span>
                         )}
