@@ -4,6 +4,7 @@ import "./globals.css";
 import { StructuredData } from "@/components/StructuredData";
 import { CookieConsent } from "@/components/CookieConsent";
 import { MetaPixel } from "@/components/MetaPixel";
+import { SiteNav } from "@/components/SiteNav";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -99,6 +100,7 @@ export default function RootLayout({
         <StructuredData />
       </head>
       <body className="min-h-screen bg-cream text-charcoal-800 antialiased">
+        <SiteNav />
         {children}
         <CookieConsent />
         <MetaPixel />
