@@ -4,7 +4,7 @@ import { Button } from "@/components/ui";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "How Much Is My Tree Worth? Tree Value Calculator & Guide 2024",
+  title: "How Much Is My Tree Worth? Tree Value Calculator & Guide 2025",
   description: "Discover your tree's true value with our free calculator. Learn factors affecting tree worth, typical value ranges ($2,000-$20,000+), and when to get professional appraisals.",
   keywords: "how much is my tree worth, tree value calculator, tree appraisal value, what is my tree worth, tree replacement cost",
   openGraph: {

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Tree Appraisal Guide: Cost, Process & When You Need One (2024)",
+  title: "Tree Appraisal Guide: Cost, Process & When You Need One (2025)",
   description: "Complete guide to tree appraisals: what they cost ($150-$1,500), when you need one, how to find ISA certified arborists, and understanding the CTLA appraisal method.",
   keywords: "tree appraisal, tree appraisal cost, tree appraisal near me, certified arborist, CTLA method, tree valuation",
   openGraph: {

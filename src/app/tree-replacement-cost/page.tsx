@@ -4,7 +4,7 @@ import { Button } from "@/components/ui";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Tree Replacement Cost Calculator & Guide - CTLA Method 2024",
+  title: "Tree Replacement Cost Calculator & Guide - CTLA Method 2025",
   description: "Calculate tree replacement costs using CTLA methodology. Understand why replacement value matters for insurance, legal disputes, and property valuation. Free calculator included.",
   keywords: "tree replacement cost, tree replacement cost calculator, cost to replace a tree, CTLA trunk formula, tree insurance value",
   openGraph: {
