@@ -5,14 +5,14 @@ export const metadata: Metadata = {
   description:
     "Calculate your tree's replacement value in under 2 minutes. Get a professional valuation report showing structural worth and annual ecosystem benefits.",
   openGraph: {
-    title: "Free Tree Value Calculator | TreeValue Pro",
+    title: "Free Tree Value Calculator | Arbor Value",
     description:
       "Discover what your trees are really worth. Calculate replacement value and ecosystem benefits in under 2 minutes.",
     images: ["/api/og?species=Tree&value=15,000&eco=850"],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Free Tree Value Calculator | TreeValue Pro",
+    title: "Free Tree Value Calculator | Arbor Value",
     description:
       "Discover what your trees are really worth. Calculate replacement value and ecosystem benefits.",
     images: ["/api/og?species=Tree&value=15,000&eco=850"],
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  name: "TreeValue Pro - Free Tree Value Calculator",
+  name: "Arbor Value - Free Tree Value Calculator",
   url: "https://www.arborvalue.com/calculator",
   applicationCategory: "UtilityApplication",
   operatingSystem: "Any",

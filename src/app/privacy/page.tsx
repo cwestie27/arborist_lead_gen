@@ -4,7 +4,7 @@ import { TreeDeciduous, ArrowLeft } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: "TreeValue Pro privacy policy - how we collect, use, and protect your data.",
+  description: "Arbor Value privacy policy - how we collect, use, and protect your data.",
 };
 
 export default function PrivacyPage() {
@@ -37,7 +37,7 @@ export default function PrivacyPage() {
               1. Information We Collect
             </h2>
             <p className="text-charcoal-600 leading-relaxed mb-4">
-              When you use TreeValue Pro, we collect the following information:
+              When you use Arbor Value, we collect the following information:
             </p>
             <ul className="list-disc pl-6 text-charcoal-600 space-y-2">
               <li><strong>Email address:</strong> When you request a tree valuation report</li>
@@ -140,7 +140,7 @@ export default function PrivacyPage() {
               8. Children&apos;s Privacy
             </h2>
             <p className="text-charcoal-600 leading-relaxed">
-              TreeValue Pro is not intended for children under 13. We do not knowingly collect
+              Arbor Value is not intended for children under 13. We do not knowingly collect
               personal information from children under 13. If you believe we have collected such
               information, please contact us immediately.
             </p>
@@ -174,7 +174,7 @@ export default function PrivacyPage() {
       <footer className="py-8 bg-charcoal-900 text-charcoal-300">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <p className="text-sm">
-            &copy; {new Date().getFullYear()} TreeValue Pro. All rights reserved.
+            &copy; {new Date().getFullYear()} Arbor Value. All rights reserved.
           </p>
         </div>
       </footer>

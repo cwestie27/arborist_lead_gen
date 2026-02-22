@@ -202,7 +202,7 @@ export function ReportClient({ data, reportId }: ReportClientProps) {
           title: hasMultipleTrees
             ? `My ${totals.treeCount} Trees are Worth ${formatCurrency(totals.structuralValue)}!`
             : `My Tree is Worth ${formatCurrency(totals.structuralValue)}!`,
-          text: "I just discovered my tree's value using TreeValue Pro!",
+          text: "I just discovered my tree's value using Arbor Value!",
           url,
         });
       } catch {

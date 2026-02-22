@@ -53,7 +53,7 @@ export default async function DashboardPage() {
           <Link href="/" className="flex items-center gap-2">
             <Trees className="w-6 h-6 text-forest-600" />
             <span className="font-bold text-lg text-charcoal-900">
-              TreeValue Pro
+              Arbor Value
             </span>
           </Link>
           <div className="flex items-center gap-4">

@@ -1,5 +1,5 @@
 /**
- * Analytics event tracking for TreeValue Pro
+ * Analytics event tracking for Arbor Value
  *
  * Tracks user journey through the wizard, conversions, and affiliate clicks.
  * Events are stored in Supabase for dashboard reporting.

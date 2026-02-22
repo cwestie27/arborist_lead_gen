@@ -5,7 +5,7 @@ const siteUrl = (process.env.NEXT_PUBLIC_APP_URL || "https://www.arborvalue.com"
 const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "TreeValue Pro",
+  name: "Arbor Value",
   url: siteUrl,
   logo: `${siteUrl}/logo.svg`,
   description:
@@ -21,7 +21,7 @@ const organizationSchema = {
 const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  name: "TreeValue Pro",
+  name: "Arbor Value",
   url: siteUrl,
   description:
     "Calculate the true value of your trees with our free professional-grade valuation tool.",
@@ -37,7 +37,7 @@ const howToSchema = {
   "@type": "HowTo",
   name: "How to Calculate Your Tree's Value",
   description:
-    "Use TreeValue Pro to calculate your tree's replacement value and annual ecosystem benefits in 3 simple steps.",
+    "Use Arbor Value to calculate your tree's replacement value and annual ecosystem benefits in 3 simple steps.",
   totalTime: "PT2M",
   step: [
     {
@@ -70,7 +70,7 @@ const faqSchema = {
       name: "How accurate is the tree valuation?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "TreeValue Pro uses the industry-standard CTLA (Council of Tree and Landscape Appraisers) Trunk Formula Method, the same methodology used by certified arborists. While our estimates are highly accurate for informational purposes, official appraisals for insurance or legal matters should be performed by a certified arborist.",
+        text: "Arbor Value uses the industry-standard CTLA (Council of Tree and Landscape Appraisers) Trunk Formula Method, the same methodology used by certified arborists. While our estimates are highly accurate for informational purposes, official appraisals for insurance or legal matters should be performed by a certified arborist.",
       },
     },
     {
@@ -94,7 +94,7 @@ const faqSchema = {
       name: "Is the tree valuation free?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes! TreeValue Pro is completely free to use. You can calculate the value of unlimited trees and receive detailed reports at no cost.",
+        text: "Yes! Arbor Value is completely free to use. You can calculate the value of unlimited trees and receive detailed reports at no cost.",
       },
     },
     {
@@ -118,7 +118,7 @@ const faqSchema = {
       name: "What types of trees can be valued?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "TreeValue Pro can value any tree species including oaks, maples, pines, fruit trees, ornamental trees, and more. Our database includes species-specific ratings for hundreds of tree varieties found in North America.",
+        text: "Arbor Value can value any tree species including oaks, maples, pines, fruit trees, ornamental trees, and more. Our database includes species-specific ratings for hundreds of tree varieties found in North America.",
       },
     },
     {
@@ -142,12 +142,12 @@ const faqSchema = {
       name: "Can I value multiple trees at once?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes! TreeValue Pro supports multi-tree assessments. You can add multiple trees to get a complete property valuation with combined structural value and ecosystem benefits for all your trees.",
+        text: "Yes! Arbor Value supports multi-tree assessments. You can add multiple trees to get a complete property valuation with combined structural value and ecosystem benefits for all your trees.",
       },
     },
     {
       "@type": "Question",
-      name: "Can TreeValue Pro help identify hazardous trees?",
+      name: "Can Arbor Value help identify hazardous trees?",
       acceptedAnswer: {
         "@type": "Answer",
         text: "Yes! Our AI-powered health assessment analyzes photos of your tree to detect signs of disease, pest infestation, and structural issues that could make a tree hazardous. Early detection of problems like dead branches, fungal growth, or trunk decay helps you address issues before they become dangerous liabilities.",

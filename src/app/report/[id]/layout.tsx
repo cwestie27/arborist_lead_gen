@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if (!uuidRegex.test(id)) {
     return {
-      title: "Report Not Found | TreeValue Pro",
+      title: "Report Not Found | Arbor Value",
       description: "This tree valuation report could not be found.",
     };
   }
@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!data) {
     return {
-      title: "Report Not Found | TreeValue Pro",
+      title: "Report Not Found | Arbor Value",
       description: "This tree valuation report could not be found.",
     };
   }
@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title,
     description,
     openGraph: {
-      title: `${title} | TreeValue Pro`,
+      title: `${title} | Arbor Value`,
       description,
       type: "article",
       images: [
@@ -54,7 +54,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     twitter: {
       card: "summary_large_image",
-      title: `${title} | TreeValue Pro`,
+      title: `${title} | Arbor Value`,
       description,
       images: [ogImageUrl],
     },

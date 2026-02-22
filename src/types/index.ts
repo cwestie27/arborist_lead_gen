@@ -1,5 +1,5 @@
 // ========================================
-// TreeValue Pro Type Definitions
+// Arbor Value Type Definitions
 // ========================================
 
 /**

@@ -201,7 +201,7 @@ function generateEmailHtml(params: EmailHtmlParams): string {
                 For official appraisals, please consult a certified arborist.
               </p>
               <p style="margin: 0; color: #a1a1aa; font-size: 11px;">
-                &copy; ${new Date().getFullYear()} TreeValue Pro. All rights reserved.
+                &copy; ${new Date().getFullYear()} Arbor Value. All rights reserved.
               </p>
             </td>
           </tr>
@@ -454,7 +454,7 @@ function generatePropertyReportEmailHtml(params: PropertyReportEmailHtmlParams):
                 Report ID: ${reportId.slice(0, 8)} | Valid for 90 days
               </p>
               <p style="margin: 0; color: #a1a1aa; font-size: 11px;">
-                &copy; ${new Date().getFullYear()} TreeValue Pro. All rights reserved.
+                &copy; ${new Date().getFullYear()} Arbor Value. All rights reserved.
               </p>
             </td>
           </tr>

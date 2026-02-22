@@ -48,7 +48,7 @@ function LandingPageContent() {
           <div className="flex items-center gap-2">
             <TreeDeciduous className="w-6 h-6 text-forest-600" />
             <span className="font-heading text-lg font-semibold text-charcoal-900">
-              TreeValue Pro
+              Arbor Value
             </span>
           </div>
         </div>
@@ -275,7 +275,7 @@ function LandingPageContent() {
       {/* Minimal Footer */}
       <footer className="py-6 px-6 border-t border-charcoal-100">
         <div className="max-w-3xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-charcoal-500">
-          <p>&copy; {new Date().getFullYear()} TreeValue Pro</p>
+          <p>&copy; {new Date().getFullYear()} Arbor Value</p>
           <div className="flex items-center gap-4">
             <Link href="/privacy" className="hover:text-charcoal-700">
               Privacy

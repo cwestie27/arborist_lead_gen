@@ -4,7 +4,7 @@ import { TreeDeciduous, ArrowLeft } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
-  description: "TreeValue Pro terms of service - rules and guidelines for using our tree valuation service.",
+  description: "Arbor Value terms of service - rules and guidelines for using our tree valuation service.",
 };
 
 export default function TermsPage() {
@@ -37,7 +37,7 @@ export default function TermsPage() {
               1. Acceptance of Terms
             </h2>
             <p className="text-charcoal-600 leading-relaxed">
-              By accessing or using TreeValue Pro (&quot;the Service&quot;), you agree to be bound by these
+              By accessing or using Arbor Value (&quot;the Service&quot;), you agree to be bound by these
               Terms of Service. If you do not agree to these terms, please do not use the Service.
             </p>
           </section>
@@ -47,7 +47,7 @@ export default function TermsPage() {
               2. Description of Service
             </h2>
             <p className="text-charcoal-600 leading-relaxed">
-              TreeValue Pro provides an online tree valuation calculator that estimates the replacement
+              Arbor Value provides an online tree valuation calculator that estimates the replacement
               value and ecosystem benefits of trees based on information you provide. The Service uses
               industry-standard methodologies including the CTLA Trunk Formula Method and i-Tree
               ecosystem valuations.
@@ -59,7 +59,7 @@ export default function TermsPage() {
               3. Valuation Disclaimer
             </h2>
             <p className="text-charcoal-600 leading-relaxed mb-4">
-              <strong>IMPORTANT:</strong> The valuations provided by TreeValue Pro are estimates for
+              <strong>IMPORTANT:</strong> The valuations provided by Arbor Value are estimates for
               informational purposes only. They are NOT:
             </p>
             <ul className="list-disc pl-6 text-charcoal-600 space-y-2">
@@ -96,7 +96,7 @@ export default function TermsPage() {
               5. Intellectual Property
             </h2>
             <p className="text-charcoal-600 leading-relaxed">
-              The Service, including its design, features, and content, is owned by TreeValue Pro
+              The Service, including its design, features, and content, is owned by Arbor Value
               and protected by copyright, trademark, and other intellectual property laws. You may
               not copy, modify, distribute, or create derivative works from the Service without
               our express written permission.
@@ -155,7 +155,7 @@ export default function TermsPage() {
               10. Indemnification
             </h2>
             <p className="text-charcoal-600 leading-relaxed">
-              You agree to indemnify and hold harmless TreeValue Pro, its officers, directors,
+              You agree to indemnify and hold harmless Arbor Value, its officers, directors,
               employees, and agents from any claims, damages, losses, or expenses arising from
               your use of the Service or violation of these Terms.
             </p>
@@ -211,7 +211,7 @@ export default function TermsPage() {
       <footer className="py-8 bg-charcoal-900 text-charcoal-300">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <p className="text-sm">
-            &copy; {new Date().getFullYear()} TreeValue Pro. All rights reserved.
+            &copy; {new Date().getFullYear()} Arbor Value. All rights reserved.
           </p>
         </div>
       </footer>

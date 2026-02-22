@@ -91,7 +91,7 @@ export default function LoginPage() {
                 <Trees className="w-8 h-8 text-forest-600" />
               </div>
               <h1 className="text-2xl font-bold text-charcoal-900 mb-2">
-                Sign in to TreeValue Pro
+                Sign in to Arbor Value
               </h1>
               <p className="text-charcoal-600">
                 Access your saved tree valuations and property reports

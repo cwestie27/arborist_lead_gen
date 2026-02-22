@@ -128,7 +128,7 @@ export function WizardContainer({ onComplete }: WizardContainerProps) {
             <div className="flex items-center gap-2">
               <TreeDeciduous className="w-6 h-6 text-forest-600" />
               <span className="font-heading text-lg font-semibold text-charcoal-900">
-                TreeValue Pro
+                Arbor Value
               </span>
             </div>
             <span className="text-sm text-charcoal-500">

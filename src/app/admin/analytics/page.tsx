@@ -380,7 +380,7 @@ export default function AdminAnalyticsPage() {
           <Link href="/" className="flex items-center gap-2">
             <TreeDeciduous className="w-6 h-6 text-forest-600" />
             <span className="font-bold text-lg text-charcoal-900">
-              TreeValue Pro
+              Arbor Value
             </span>
           </Link>
           <div className="flex items-center gap-2 text-sm text-charcoal-500">

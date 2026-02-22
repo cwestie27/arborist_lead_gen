@@ -467,7 +467,7 @@ export default function HowMuchIsMyTreeWorth() {
             <div className="flex items-center gap-2">
               <TreeDeciduous className="w-6 h-6 text-forest-400" />
               <span className="font-heading text-xl font-semibold text-white">
-                TreeValue Pro
+                Arbor Value
               </span>
             </div>
             <div className="flex items-center gap-6 text-sm">
@@ -482,7 +482,7 @@ export default function HowMuchIsMyTreeWorth() {
               </Link>
             </div>
             <p className="text-sm">
-              &copy; {new Date().getFullYear()} TreeValue Pro. All rights reserved.
+              &copy; {new Date().getFullYear()} Arbor Value. All rights reserved.
             </p>
           </div>
         </div>

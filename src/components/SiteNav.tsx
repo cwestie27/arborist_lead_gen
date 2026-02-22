@@ -8,7 +8,7 @@ export function SiteNav() {
         <Link href="/" className="flex items-center gap-2 group">
           <TreeDeciduous className="w-6 h-6 text-forest-600 group-hover:text-forest-700 transition-colors" />
           <span className="font-heading text-xl font-semibold text-charcoal-900">
-            TreeValue Pro
+            Arbor Value
           </span>
         </Link>
         <div className="flex items-center gap-6 text-sm font-medium text-charcoal-600">
