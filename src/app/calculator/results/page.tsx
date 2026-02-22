@@ -633,7 +633,7 @@ export default function ResultsPage() {
                 <Leaf className="w-5 h-5 text-forest-600 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-medium text-charcoal-800">
-                    {Math.round(totals.carbonLbsPerYear / 8887).toLocaleString() || "< 1"} car trips
+                    {Math.round(totals.carbonLbsPerYear / 5.3).toLocaleString() || "< 1"} car trips
                   </p>
                   <p className="text-charcoal-600">
                     equivalent CO2 offset per year
