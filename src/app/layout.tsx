@@ -29,8 +29,8 @@ const siteUrl = (process.env.NEXT_PUBLIC_APP_URL || "https://www.arborvalue.com"
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "TreeValue Pro | Discover What Your Trees Are Really Worth",
-    template: "%s | TreeValue Pro",
+    default: "Arbor Value | Discover What Your Trees Are Really Worth",
+    template: "%s | Arbor Value",
   },
   description:
     "Calculate the true value of your trees. Get a professional tree valuation report showing replacement cost and annual ecosystem benefits using the CTLA Trunk Formula Method.",
@@ -46,9 +46,9 @@ export const metadata: Metadata = {
     "carbon sequestration",
     "tree care",
   ],
-  authors: [{ name: "TreeValue Pro" }],
-  creator: "TreeValue Pro",
-  publisher: "TreeValue Pro",
+  authors: [{ name: "Arbor Value" }],
+  creator: "Arbor Value",
+  publisher: "Arbor Value",
   robots: {
     index: true,
     follow: true,
@@ -61,25 +61,25 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "TreeValue Pro | Discover What Your Trees Are Really Worth",
+    title: "Arbor Value | Discover What Your Trees Are Really Worth",
     description:
       "Calculate the true value of your trees. Get a professional tree valuation report.",
     type: "website",
     locale: "en_US",
     url: siteUrl,
-    siteName: "TreeValue Pro",
+    siteName: "Arbor Value",
     images: [
       {
         url: "/api/og",
         width: 1200,
         height: 630,
-        alt: "TreeValue Pro - Tree Valuation Calculator",
+        alt: "Arbor Value - Tree Valuation Calculator",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "TreeValue Pro | Discover What Your Trees Are Really Worth",
+    title: "Arbor Value | Discover What Your Trees Are Really Worth",
     description:
       "Calculate the true value of your trees. Get a professional tree valuation report.",
     images: ["/api/og"],
