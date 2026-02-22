@@ -23,16 +23,11 @@ import { formatCurrency } from "@/lib/utils";
 
 interface AnalyticsData {
   metrics: {
-    wizard_started: number;
-    email_captured: number;
-    valuation_completed: number;
-    report_viewed: number;
-    affiliate_clicked: number;
-    page_view: number;
+    total: number;
+    byEvent: Record<string, number>;
+    byDay: Record<string, number>;
+    uniqueSessions: number;
   };
-  totalEvents: number;
-  uniqueSessions: number;
-  dailyMetrics: { date: string; count: number }[];
 }
 
 interface TreeInput {
@@ -206,8 +201,9 @@ export default function AdminDashboard() {
 
   const filteredLeads = filter === "all" ? leads : leads.filter(l => l.service_type === filter);
 
-  const emailCaptureRate = analytics && analytics.metrics.wizard_started > 0
-    ? ((analytics.metrics.email_captured / analytics.metrics.wizard_started) * 100).toFixed(1)
+  const byEvent = analytics?.metrics.byEvent || {};
+  const emailCaptureRate = byEvent.wizard_started > 0
+    ? ((( byEvent.email_captured || 0) / byEvent.wizard_started) * 100).toFixed(1)
     : "0";
 
   const exportCSV = () => {
@@ -270,10 +266,10 @@ export default function AdminDashboard() {
         <section>
           <h2 className="text-sm font-medium text-charcoal-500 uppercase tracking-wider mb-3">Overview</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-            <StatCard label="Page Views" value={analytics?.metrics.page_view || 0} icon={BarChart3} />
-            <StatCard label="Sessions" value={analytics?.uniqueSessions || 0} icon={Users} color="sky" />
-            <StatCard label="Wizards Started" value={analytics?.metrics.wizard_started || 0} icon={TrendingUp} />
-            <StatCard label="Emails Captured" value={analytics?.metrics.email_captured || 0} icon={Mail} color="amber" />
+            <StatCard label="Page Views" value={byEvent.page_view || 0} icon={BarChart3} />
+            <StatCard label="Sessions" value={analytics?.metrics.uniqueSessions || 0} icon={Users} color="sky" />
+            <StatCard label="Wizards Started" value={byEvent.wizard_started || 0} icon={TrendingUp} />
+            <StatCard label="Emails Captured" value={byEvent.email_captured || 0} icon={Mail} color="amber" />
             <StatCard label="Email Rate" value={`${emailCaptureRate}%`} icon={MousePointerClick} color="purple" />
             <StatCard label="Total Leads" value={leads.length} icon={TreeDeciduous} />
           </div>
@@ -285,11 +281,11 @@ export default function AdminDashboard() {
             <h2 className="text-sm font-medium text-charcoal-500 uppercase tracking-wider mb-3">Conversion Funnel</h2>
             <Card>
               <CardContent className="py-4 px-5 space-y-2">
-                <FunnelBar label="Wizard Started" value={analytics.metrics.wizard_started} max={analytics.metrics.wizard_started} />
-                <FunnelBar label="Email Captured" value={analytics.metrics.email_captured} max={analytics.metrics.wizard_started} />
-                <FunnelBar label="Valuation Done" value={analytics.metrics.valuation_completed} max={analytics.metrics.wizard_started} />
-                <FunnelBar label="Report Viewed" value={analytics.metrics.report_viewed} max={analytics.metrics.wizard_started} />
-                <FunnelBar label="Affiliate Click" value={analytics.metrics.affiliate_clicked} max={analytics.metrics.wizard_started} />
+                <FunnelBar label="Wizard Started" value={byEvent.wizard_started || 0} max={byEvent.wizard_started || 1} />
+                <FunnelBar label="Email Captured" value={byEvent.email_captured || 0} max={byEvent.wizard_started || 1} />
+                <FunnelBar label="Valuation Done" value={byEvent.valuation_completed || 0} max={byEvent.wizard_started || 1} />
+                <FunnelBar label="Report Viewed" value={byEvent.report_viewed || 0} max={byEvent.wizard_started || 1} />
+                <FunnelBar label="Affiliate Click" value={byEvent.affiliate_clicked || 0} max={byEvent.wizard_started || 1} />
               </CardContent>
             </Card>
           </section>
