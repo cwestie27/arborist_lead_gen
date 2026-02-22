@@ -39,14 +39,37 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   // Protected routes - redirect to login if not authenticated
-  if (
-    request.nextUrl.pathname.startsWith("/dashboard") ||
-    request.nextUrl.pathname.startsWith("/admin")
-  ) {
+  if (request.nextUrl.pathname.startsWith("/dashboard")) {
     if (!user) {
       const loginUrl = new URL("/auth/login", request.url);
       loginUrl.searchParams.set("next", request.nextUrl.pathname);
       return NextResponse.redirect(loginUrl);
+    }
+  }
+
+  // Admin routes - simple token auth via cookie or query param
+  if (request.nextUrl.pathname.startsWith("/admin")) {
+    const adminToken = process.env.ADMIN_TOKEN;
+    if (adminToken) {
+      const cookieToken = request.cookies.get("admin_token")?.value;
+      const queryToken = request.nextUrl.searchParams.get("token");
+      
+      if (queryToken === adminToken) {
+        // Set cookie and redirect without token in URL
+        const cleanUrl = new URL(request.nextUrl.pathname, request.url);
+        const redirectResponse = NextResponse.redirect(cleanUrl);
+        redirectResponse.cookies.set("admin_token", adminToken, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "strict",
+          maxAge: 60 * 60 * 24 * 30, // 30 days
+        });
+        return redirectResponse;
+      }
+      
+      if (cookieToken !== adminToken) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
     }
   }
 
