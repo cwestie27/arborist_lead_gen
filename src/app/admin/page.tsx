@@ -169,21 +169,28 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [filter, setFilter] = useState<"all" | "arborist" | "tree_care_quote">("all");
+  const [days, setDays] = useState(30);
 
   useEffect(() => {
+    setLoading(true);
     Promise.all([
-      fetch("/api/analytics?days=30").then(r => r.json()).catch(() => null),
+      fetch(`/api/analytics?days=${days}`).then(r => r.json()).catch(() => null),
       fetch("/api/admin/leads").then(r => r.json()).catch(() => ({ leads: [] })),
       fetch("/api/admin/reports").then(r => r.json()).catch(() => ({ reports: [] })),
     ]).then(([analyticsRes, leadsRes, reportsRes]) => {
       if (analyticsRes) {
         setAnalytics(analyticsRes);
       }
-      setLeads(leadsRes?.leads || []);
-      setReports(reportsRes?.reports || []);
+      // Filter leads by date range
+      const cutoff = new Date();
+      cutoff.setDate(cutoff.getDate() - days);
+      const allLeads = leadsRes?.leads || [];
+      setLeads(allLeads.filter((l: Lead) => new Date(l.created_at) >= cutoff));
+      const allReports = reportsRes?.reports || [];
+      setReports(allReports.filter((r: ReportRow) => new Date(r.created_at) >= cutoff));
       setLoading(false);
     });
-  }, []);
+  }, [days]);
 
   const toggleRow = (id: string) => {
     const next = new Set(expandedRows);
@@ -252,12 +259,27 @@ export default function AdminDashboard() {
             </Link>
             <div>
               <h1 className="font-heading text-xl font-bold text-charcoal-900">Arbor Value Admin</h1>
-              <p className="text-xs text-charcoal-500">Analytics & Leads — Last 30 days</p>
+              <p className="text-xs text-charcoal-500">Analytics & Leads</p>
             </div>
           </div>
-          <Button variant="secondary" size="sm" leftIcon={<Download className="w-4 h-4" />} onClick={exportCSV}>
-            Export CSV
-          </Button>
+          <div className="flex items-center gap-3">
+            <div className="flex bg-charcoal-100 rounded-lg p-0.5">
+              {([7, 14, 30, 90, 365] as const).map(d => (
+                <button
+                  key={d}
+                  onClick={() => setDays(d)}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                    days === d ? "bg-white text-charcoal-900 shadow-sm" : "text-charcoal-500 hover:text-charcoal-700"
+                  }`}
+                >
+                  {d <= 30 ? `${d}d` : d === 90 ? "3mo" : "1yr"}
+                </button>
+              ))}
+            </div>
+            <Button variant="secondary" size="sm" leftIcon={<Download className="w-4 h-4" />} onClick={exportCSV}>
+              Export
+            </Button>
+          </div>
         </div>
       </header>
 
