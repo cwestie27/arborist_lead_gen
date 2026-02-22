@@ -66,7 +66,7 @@ export default function TreeValueResources() {
           <div className="mb-16">
             <div className="bg-gradient-to-r from-forest-700 to-earth-600 rounded-3xl p-8 md:p-12 text-white">
               <div className="max-w-4xl mx-auto text-center">
-                <div className="w-20 h-20 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <div className="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
                   <Calculator className="w-10 h-10" />
                 </div>
                 
@@ -74,7 +74,7 @@ export default function TreeValueResources() {
                   Free Tree Value Calculator
                 </h3>
                 
-                <p className="text-lg text-white text-opacity-80 mb-8 leading-relaxed">
+                <p className="text-lg text-white/80 mb-8 leading-relaxed">
                   Get a professional-grade valuation of your tree's replacement cost and annual ecosystem benefits. Uses industry-standard CTLA methodology accepted by insurance companies and courts.
                 </p>
 
@@ -86,16 +86,16 @@ export default function TreeValueResources() {
                 </div>
 
                 <div className="grid md:grid-cols-3 gap-6 text-center">
-                  <div className="bg-white bg-opacity-10 rounded-xl p-4">
-                    <div className="font-semibold text-white text-opacity-80 mb-1">Replacement Value</div>
+                  <div className="bg-white/10 rounded-xl p-4">
+                    <div className="font-semibold text-white/80 mb-1">Replacement Value</div>
                     <div className="text-2xl font-mono font-bold">$2K - $50K+</div>
                   </div>
-                  <div className="bg-white bg-opacity-10 rounded-xl p-4">
-                    <div className="font-semibold text-white text-opacity-80 mb-1">Annual Benefits</div>
+                  <div className="bg-white/10 rounded-xl p-4">
+                    <div className="font-semibold text-white/80 mb-1">Annual Benefits</div>
                     <div className="text-2xl font-mono font-bold">$50 - $500/yr</div>
                   </div>
-                  <div className="bg-white bg-opacity-10 rounded-xl p-4">
-                    <div className="font-semibold text-white text-opacity-80 mb-1">Time to Complete</div>
+                  <div className="bg-white/10 rounded-xl p-4">
+                    <div className="font-semibold text-white/80 mb-1">Time to Complete</div>
                     <div className="text-2xl font-mono font-bold">&lt; 2 min</div>
                   </div>
                 </div>
@@ -399,7 +399,7 @@ export default function TreeValueResources() {
           <h2 className="font-heading text-3xl md:text-4xl font-semibold mb-6">
             Start With Your Free Tree Valuation
           </h2>
-          <p className="text-xl text-white text-opacity-80 mb-10 leading-relaxed">
+          <p className="text-xl text-white/80 mb-10 leading-relaxed">
             Put our expert resources to work for you. Get a professional-grade assessment of your tree's value in under 2 minutes using the same methods trusted by certified arborists.
           </p>
           
@@ -412,16 +412,16 @@ export default function TreeValueResources() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 text-left">
-            <div className="bg-white bg-opacity-10 rounded-xl p-6">
-              <h4 className="font-semibold text-white text-opacity-80 mb-2">Instant Results</h4>
+            <div className="bg-white/10 rounded-xl p-6">
+              <h4 className="font-semibold text-white/80 mb-2">Instant Results</h4>
               <p className="text-forest-200 text-sm">Professional valuation in under 2 minutes with detailed report delivered to your inbox</p>
             </div>
-            <div className="bg-white bg-opacity-10 rounded-xl p-6">
-              <h4 className="font-semibold text-white text-opacity-80 mb-2">Expert Methodology</h4>
+            <div className="bg-white/10 rounded-xl p-6">
+              <h4 className="font-semibold text-white/80 mb-2">Expert Methodology</h4>
               <p className="text-forest-200 text-sm">CTLA and i-Tree methods used by certified arborists and accepted by insurance companies</p>
             </div>
-            <div className="bg-white bg-opacity-10 rounded-xl p-6">
-              <h4 className="font-semibold text-white text-opacity-80 mb-2">Always Free</h4>
+            <div className="bg-white/10 rounded-xl p-6">
+              <h4 className="font-semibold text-white/80 mb-2">Always Free</h4>
               <p className="text-forest-200 text-sm">No hidden fees, no subscriptions. Get unlimited valuations and keep all your reports</p>
             </div>
           </div>
