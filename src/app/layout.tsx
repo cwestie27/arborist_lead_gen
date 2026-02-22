@@ -24,7 +24,7 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://treevalue.pro";
+const siteUrl = (process.env.NEXT_PUBLIC_APP_URL || "https://www.arborvalue.com").trim();
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

@@ -1,6 +1,6 @@
 "use client";
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://treevalue.pro";
+const siteUrl = (process.env.NEXT_PUBLIC_APP_URL || "https://www.arborvalue.com").trim();
 
 const organizationSchema = {
   "@context": "https://schema.org",
