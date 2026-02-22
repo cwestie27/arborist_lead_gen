@@ -40,9 +40,11 @@ export default function Home() {
                   Calculate My Tree&apos;s Value
                 </Button>
               </Link>
-              <Button variant="secondary" size="lg">
-                Learn How It Works
-              </Button>
+              <a href="#how-it-works">
+                <Button variant="secondary" size="lg">
+                  Learn How It Works
+                </Button>
+              </a>
             </div>
 
             {/* Trust indicators */}
@@ -200,7 +202,7 @@ export default function Home() {
       </section>
 
       {/* How It Works */}
-      <section className="py-20 md:py-28 bg-forest-50">
+      <section id="how-it-works" className="py-20 md:py-28 bg-forest-50 scroll-mt-16">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="font-heading text-3xl md:text-4xl font-semibold text-charcoal-900 mb-4">
