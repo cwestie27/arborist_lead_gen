@@ -70,7 +70,7 @@ export const metadata: Metadata = {
     siteName: "Arbor Value",
     images: [
       {
-        url: "/api/og",
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "Arbor Value - Tree Valuation Calculator",
@@ -82,7 +82,7 @@ export const metadata: Metadata = {
     title: "Arbor Value | Discover What Your Trees Are Really Worth",
     description:
       "Calculate the true value of your trees. Get a professional tree valuation report.",
-    images: ["/api/og"],
+    images: ["/og-image.png"],
   },
   alternates: {
     canonical: siteUrl,
