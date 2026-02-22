@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isEmailSent, setIsEmailSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -21,6 +22,34 @@ export default function LoginPage() {
 
     try {
       const supabase = createClient();
+      
+      if (password) {
+        // Password login
+        const { error: authError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (authError) {
+          // If user doesn't exist, sign them up
+          if (authError.message.includes("Invalid login")) {
+            const { error: signUpError } = await supabase.auth.signUp({
+              email,
+              password,
+              options: {
+                emailRedirectTo: `${window.location.origin}/auth/callback`,
+              },
+            });
+            if (signUpError) throw signUpError;
+            setIsEmailSent(true);
+            return;
+          }
+          throw authError;
+        }
+        router.push("/admin");
+        return;
+      }
+      
+      // Magic link fallback
       const { error: authError } = await supabase.auth.signInWithOtp({
         email,
         options: {
@@ -118,6 +147,24 @@ export default function LoginPage() {
                     className="w-full pl-10 pr-4 py-3 border border-charcoal-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-forest-500 focus:border-transparent"
                   />
                 </div>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-charcoal-700 mb-1"
+                >
+                  Password
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter password"
+                  className="w-full px-4 py-3 border border-charcoal-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-forest-500 focus:border-transparent"
+                />
+                <p className="text-xs text-charcoal-400 mt-1">Leave blank to use magic link instead</p>
               </div>
 
               {error && (
