@@ -98,7 +98,7 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${playfair.variable} ${jetbrainsMono.variable}`}>
       <head>
         <StructuredData />
-        <script defer src="https://analytics.haveaidoit.com/script.js" data-website-id="a196fcc8-e3cd-4aa5-b7f1-83c08bf7982d" />
+        <script defer src="https://analytics.haveaidoit.com/script.js" data-website-id="a196fcc8-e3cd-4aa5-b7f1-83c08bf7982d"></script>
       </head>
       <body className="min-h-screen bg-cream text-charcoal-800 antialiased">
         <SiteNav />
