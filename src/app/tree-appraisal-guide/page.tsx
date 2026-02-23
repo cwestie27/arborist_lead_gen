@@ -18,7 +18,7 @@ export default function TreeAppraisalGuide() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-forest-50 to-cream">
+      <section className="relative overflow-hidden bg-gradient-to-b from-sky-50 to-cream">
         <div className="absolute inset-0 opacity-30">
           <div className="absolute top-20 left-10 w-64 h-64 bg-forest-200 rounded-full blur-3xl" />
           <div className="absolute bottom-20 right-10 w-96 h-96 bg-earth-200 rounded-full blur-3xl" />
