@@ -62,47 +62,6 @@ export default function TreeValueResources() {
             </p>
           </div>
 
-          {/* Featured Calculator */}
-          <div className="mb-16">
-            <div className="bg-gradient-to-r from-forest-700 to-earth-600 rounded-3xl p-8 md:p-12 text-white">
-              <div className="max-w-4xl mx-auto text-center">
-                <div className="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <Calculator className="w-10 h-10" />
-                </div>
-                
-                <h3 className="font-heading text-2xl md:text-3xl font-semibold mb-4">
-                  Free Tree Value Calculator
-                </h3>
-                
-                <p className="text-lg text-white/80 mb-8 leading-relaxed">
-                  Get a professional-grade valuation of your tree's replacement cost and annual ecosystem benefits. Uses industry-standard CTLA methodology accepted by insurance companies and courts.
-                </p>
-
-                <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-                  <Link href="/calculator" className="inline-flex items-center gap-2 px-8 py-3 bg-white text-forest-800 font-semibold rounded-xl hover:bg-forest-50 transition-colors text-lg">
-                      Calculate Your Tree's Value
-                      <ArrowRight className="w-5 h-5" />
-                  </Link>
-                </div>
-
-                <div className="grid md:grid-cols-3 gap-6 text-center">
-                  <div className="bg-white/10 rounded-xl p-4">
-                    <div className="font-semibold text-white/80 mb-1">Replacement Value</div>
-                    <div className="text-2xl font-mono font-bold">$2K - $50K+</div>
-                  </div>
-                  <div className="bg-white/10 rounded-xl p-4">
-                    <div className="font-semibold text-white/80 mb-1">Annual Benefits</div>
-                    <div className="text-2xl font-mono font-bold">$50 - $500/yr</div>
-                  </div>
-                  <div className="bg-white/10 rounded-xl p-4">
-                    <div className="font-semibold text-white/80 mb-1">Time to Complete</div>
-                    <div className="text-2xl font-mono font-bold">&lt; 2 min</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
           {/* Resource Cards Grid */}
           <div className="grid md:grid-cols-3 gap-8">
             {/* Tree Value Guide */}
