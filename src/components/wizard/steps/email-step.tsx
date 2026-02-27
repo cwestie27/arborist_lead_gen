@@ -1,15 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, Lock, MapPin } from "lucide-react";
+import { Mail, Lock, MapPin, Phone } from "lucide-react";
 import { Input } from "@/components/ui";
 import { useWizard } from "../wizard-context";
 
 export function EmailStep() {
-  const { data, setEmail, setAddress, setZipCode, errors, setError, clearError } = useWizard();
+  const { data, setEmail, setAddress, setZipCode, setPhone, errors, setError, clearError } = useWizard();
   const [localEmail, setLocalEmail] = useState(data.email || "");
   const [localAddress, setLocalAddress] = useState(data.address || "");
   const [localZipCode, setLocalZipCode] = useState(data.zipCode || "");
+  const [localPhone, setLocalPhone] = useState(data.phone || "");
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -72,6 +73,33 @@ export function EmailStep() {
     }
   };
 
+
+  const formatPhone = (value: string): string => {
+    const digits = value.replace(/\D/g, "").slice(0, 10);
+    if (digits.length <= 3) return digits;
+    if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPhone(e.target.value);
+    setLocalPhone(formatted);
+    const digits = formatted.replace(/\D/g, "");
+    if (digits.length === 10) {
+      clearError("phone");
+      setPhone(formatted);
+    } else if (digits.length > 0) {
+      setPhone("");
+    }
+  };
+
+  const handlePhoneBlur = () => {
+    const digits = localPhone.replace(/\D/g, "");
+    if (digits.length > 0 && digits.length < 10) {
+      setError("phone", "Please enter a valid 10-digit phone number");
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="text-center mb-8">
@@ -131,6 +159,17 @@ export function EmailStep() {
           error={errors.zipCode}
           hint="Required for accurate regional valuation"
         />
+
+        <Input
+          label="Phone Number (optional)"
+          type="tel"
+          placeholder="(555) 123-4567"
+          value={localPhone}
+          onChange={handlePhoneChange}
+          onBlur={handlePhoneBlur}
+          error={errors.phone}
+          hint="Get a faster response from local tree professionals"
+        />
       </div>
 
       {/* Trust Signals */}
@@ -142,6 +181,10 @@ export function EmailStep() {
         <div className="flex items-center gap-2">
           <Mail className="w-4 h-4" />
           <span>No spam, ever</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Phone className="w-4 h-4" />
+          <span>We never cold call</span>
         </div>
       </div>
     </div>

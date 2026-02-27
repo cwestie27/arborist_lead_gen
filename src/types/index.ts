@@ -101,6 +101,7 @@ export interface WizardData {
   email: string | null;
   address: string | null;
   zipCode: string | null;
+  phone: string | null;
   propertyName?: string;
 }
 
@@ -143,6 +144,7 @@ export interface PropertyValuation {
   email: string | null;
   address: string | null;
   zipCode: string | null;
+  phone: string | null;
   createdAt: string;
 }
 
@@ -174,6 +176,7 @@ export interface UserProfile {
   id: string;
   email: string;
   zipCode: string | null;
+  phone: string | null;
   createdAt: string;
 }
 
