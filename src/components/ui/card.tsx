@@ -130,10 +130,11 @@ const SelectionCard = forwardRef<HTMLButtonElement, SelectionCardProps>(
         ref={ref}
         type="button"
         className={cn(
-          "group relative w-full p-6 text-left",
+          "group relative w-full p-4 sm:p-6 text-left",
           "bg-white rounded-xl",
           "border-2 transition-all duration-200",
           "focus:outline-none focus:ring-2 focus:ring-forest-500 focus:ring-offset-2",
+          "overflow-hidden",
           selected
             ? "border-forest-700 bg-forest-50 shadow-md"
             : "border-charcoal-200 hover:border-forest-400 hover:bg-forest-50/50 shadow-sm hover:shadow-md",
@@ -141,12 +142,13 @@ const SelectionCard = forwardRef<HTMLButtonElement, SelectionCardProps>(
         )}
         {...props}
       >
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 sm:gap-4">
           {icon && (
             <div
               className={cn(
-                "w-14 h-14 rounded-full flex items-center justify-center shrink-0",
+                "w-10 h-10 sm:w-14 sm:h-14 rounded-full flex items-center justify-center shrink-0",
                 "transition-colors duration-200",
+                "[&>svg]:w-5 [&>svg]:h-5 sm:[&>svg]:w-7 sm:[&>svg]:h-7",
                 selected
                   ? "bg-forest-200 text-forest-800"
                   : "bg-forest-100 text-forest-700 group-hover:bg-forest-200"
@@ -158,21 +160,21 @@ const SelectionCard = forwardRef<HTMLButtonElement, SelectionCardProps>(
           <div className="flex-1 min-w-0">
             <h3
               className={cn(
-                "font-semibold text-lg",
+                "font-semibold text-base sm:text-lg",
                 selected ? "text-forest-900" : "text-charcoal-900"
               )}
             >
               {title}
             </h3>
             {description && (
-              <p className="text-sm text-charcoal-500 mt-0.5 truncate">
+              <p className="text-xs sm:text-sm text-charcoal-500 mt-0.5">
                 {description}
               </p>
             )}
           </div>
           <div
             className={cn(
-              "w-6 h-6 rounded-full border-2 shrink-0",
+              "w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 shrink-0",
               "flex items-center justify-center",
               "transition-all duration-200",
               selected
@@ -182,7 +184,7 @@ const SelectionCard = forwardRef<HTMLButtonElement, SelectionCardProps>(
           >
             {selected && (
               <svg
-                className="w-3.5 h-3.5 text-white"
+                className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
