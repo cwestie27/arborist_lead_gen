@@ -284,8 +284,96 @@ export default function TreeValueResources() {
         </div>
       </section>
 
-      {/* Why These Resources Matter */}
+      {/* Species-Specific Calculators */}
       <section className="py-20 md:py-28 bg-white">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="font-heading text-3xl md:text-4xl font-semibold text-charcoal-900 mb-4">
+              Tree Value by Species
+            </h2>
+            <p className="text-lg text-charcoal-600 max-w-2xl mx-auto">
+              Get species-specific valuation guides with typical value ranges, unique characteristics, and factors that affect worth.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Link href="/oak-tree-value-calculator" className="group">
+              <div className="bg-cream rounded-xl p-6 border border-charcoal-100 hover:shadow-md transition-all group-hover:border-forest-300">
+                <h4 className="font-heading font-semibold text-charcoal-900 mb-2">Oak Tree Calculator</h4>
+                <p className="text-sm text-charcoal-600 mb-2">White oak, red oak, and more</p>
+                <p className="text-sm font-mono text-forest-700">$8K - $50K+</p>
+              </div>
+            </Link>
+
+            <Link href="/maple-tree-value-calculator" className="group">
+              <div className="bg-cream rounded-xl p-6 border border-charcoal-100 hover:shadow-md transition-all group-hover:border-forest-300">
+                <h4 className="font-heading font-semibold text-charcoal-900 mb-2">Maple Tree Calculator</h4>
+                <p className="text-sm text-charcoal-600 mb-2">Sugar maple, red maple, Japanese maple</p>
+                <p className="text-sm font-mono text-forest-700">$10K - $45K+</p>
+              </div>
+            </Link>
+
+            <Link href="/live-oak-tree-value-calculator" className="group">
+              <div className="bg-cream rounded-xl p-6 border border-charcoal-100 hover:shadow-md transition-all group-hover:border-forest-300">
+                <h4 className="font-heading font-semibold text-charcoal-900 mb-2">Live Oak Calculator</h4>
+                <p className="text-sm text-charcoal-600 mb-2">Iconic Southern heritage trees</p>
+                <p className="text-sm font-mono text-forest-700">$15K - $80K+</p>
+              </div>
+            </Link>
+
+            <Link href="/pecan-tree-value-calculator" className="group">
+              <div className="bg-cream rounded-xl p-6 border border-charcoal-100 hover:shadow-md transition-all group-hover:border-forest-300">
+                <h4 className="font-heading font-semibold text-charcoal-900 mb-2">Pecan Tree Calculator</h4>
+                <p className="text-sm text-charcoal-600 mb-2">Nut production + premium hardwood</p>
+                <p className="text-sm font-mono text-forest-700">$8K - $60K+</p>
+              </div>
+            </Link>
+
+            <Link href="/black-walnut-tree-value-calculator" className="group">
+              <div className="bg-cream rounded-xl p-6 border border-charcoal-100 hover:shadow-md transition-all group-hover:border-forest-300">
+                <h4 className="font-heading font-semibold text-charcoal-900 mb-2">Black Walnut Calculator</h4>
+                <p className="text-sm text-charcoal-600 mb-2">America&apos;s most valuable hardwood</p>
+                <p className="text-sm font-mono text-forest-700">$10K - $50K+</p>
+              </div>
+            </Link>
+
+            <Link href="/cedar-tree-value-calculator" className="group">
+              <div className="bg-cream rounded-xl p-6 border border-charcoal-100 hover:shadow-md transition-all group-hover:border-forest-300">
+                <h4 className="font-heading font-semibold text-charcoal-900 mb-2">Cedar Tree Calculator</h4>
+                <p className="text-sm text-charcoal-600 mb-2">Aromatic, rot-resistant wood</p>
+                <p className="text-sm font-mono text-forest-700">$5K - $30K+</p>
+              </div>
+            </Link>
+
+            <Link href="/cypress-tree-value-calculator" className="group">
+              <div className="bg-cream rounded-xl p-6 border border-charcoal-100 hover:shadow-md transition-all group-hover:border-forest-300">
+                <h4 className="font-heading font-semibold text-charcoal-900 mb-2">Cypress Tree Calculator</h4>
+                <p className="text-sm text-charcoal-600 mb-2">Bald cypress, 1000+ year lifespans</p>
+                <p className="text-sm font-mono text-forest-700">$8K - $50K+</p>
+              </div>
+            </Link>
+
+            <Link href="/fruit-tree-value-calculator" className="group">
+              <div className="bg-cream rounded-xl p-6 border border-charcoal-100 hover:shadow-md transition-all group-hover:border-forest-300">
+                <h4 className="font-heading font-semibold text-charcoal-900 mb-2">Fruit Tree Calculator</h4>
+                <p className="text-sm text-charcoal-600 mb-2">Apple, cherry, citrus, and more</p>
+                <p className="text-sm font-mono text-forest-700">$2K - $25K+</p>
+              </div>
+            </Link>
+
+            <Link href="/best-tree-value-calculator-apps" className="group">
+              <div className="bg-cream rounded-xl p-6 border border-charcoal-100 hover:shadow-md transition-all group-hover:border-amber-300">
+                <h4 className="font-heading font-semibold text-charcoal-900 mb-2">Calculator Comparison</h4>
+                <p className="text-sm text-charcoal-600 mb-2">Best tree value apps &amp; tools 2026</p>
+                <p className="text-sm font-mono text-amber-700">Free Guide</p>
+              </div>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Why These Resources Matter */}
+      <section className="py-20 md:py-28 bg-cream">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="font-heading text-3xl md:text-4xl font-semibold text-charcoal-900 mb-4">
