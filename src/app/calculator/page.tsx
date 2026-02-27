@@ -65,6 +65,7 @@ function CalculatorContent() {
         email: data.email,
         address: data.address,
         zipCode: data.zipCode,
+        phone: data.phone,
         createdAt: new Date().toISOString(),
       };
 

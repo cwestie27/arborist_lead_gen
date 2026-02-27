@@ -43,6 +43,7 @@ type WizardAction =
   | { type: "SET_EMAIL"; payload: string }
   | { type: "SET_ADDRESS"; payload: string }
   | { type: "SET_ZIP_CODE"; payload: string }
+  | { type: "SET_PHONE"; payload: string }
   | { type: "SET_IDENTIFICATION_PHOTOS"; payload: PhotoUpload[] }
   | { type: "SET_HEALTH_PHOTOS"; payload: PhotoUpload[] }
   | { type: "SET_IDENTIFICATION_RESULT"; payload: KindwiseIdentification }
@@ -85,6 +86,7 @@ interface WizardContextValue extends WizardState {
   setEmail: (email: string) => void;
   setAddress: (address: string) => void;
   setZipCode: (zipCode: string) => void;
+  setPhone: (phone: string) => void;
   nextStep: () => void;
   prevStep: () => void;
   goToStep: (step: number) => void;
@@ -130,6 +132,7 @@ const initialState: WizardState = {
     email: null,
     address: null,
     zipCode: null,
+    phone: null,
   },
   isComplete: false,
   isIdentifying: false,
@@ -255,6 +258,12 @@ function wizardReducer(state: WizardState, action: WizardAction): WizardState {
       return {
         ...state,
         data: { ...state.data, zipCode: action.payload },
+      };
+
+    case "SET_PHONE":
+      return {
+        ...state,
+        data: { ...state.data, phone: action.payload },
       };
 
     case "ADD_TREE":
@@ -431,6 +440,10 @@ export function WizardProvider({ children, initialData }: WizardProviderProps) {
     dispatch({ type: "SET_ZIP_CODE", payload: zipCode });
   }, []);
 
+  const setPhone = useCallback((phone: string) => {
+    dispatch({ type: "SET_PHONE", payload: phone });
+  }, []);
+
   const nextStep = useCallback(() => {
     dispatch({ type: "NEXT_STEP" });
   }, []);
@@ -486,6 +499,7 @@ export function WizardProvider({ children, initialData }: WizardProviderProps) {
       setEmail,
       setAddress,
       setZipCode,
+      setPhone,
       nextStep,
       prevStep,
       goToStep,
@@ -520,6 +534,7 @@ export function WizardProvider({ children, initialData }: WizardProviderProps) {
       setEmail,
       setAddress,
       setZipCode,
+      setPhone,
       nextStep,
       prevStep,
       goToStep,

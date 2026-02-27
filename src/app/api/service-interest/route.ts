@@ -16,6 +16,7 @@ export async function POST(request: NextRequest) {
       reportId,
       treeCount,
       hasHealthIssues,
+      phone,
     } = body as {
       serviceType: "arborist" | "tree_care_quote";
       email?: string;
@@ -25,6 +26,7 @@ export async function POST(request: NextRequest) {
       reportId?: string;
       treeCount?: number;
       hasHealthIssues?: boolean;
+      phone?: string;
     };
 
     if (!serviceType) {
@@ -53,6 +55,7 @@ export async function POST(request: NextRequest) {
       report_id: reportId || null,
       tree_count: treeCount || null,
       has_health_issues: hasHealthIssues || false,
+      phone: phone || null,
       ip_address: ip,
       user_agent: userAgent,
     });

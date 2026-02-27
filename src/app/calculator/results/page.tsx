@@ -31,6 +31,7 @@ import type { PropertyValuation, TreeData, TreeValuation } from "@/types";
 async function recordServiceInterest(
   serviceType: "arborist" | "tree_care_quote",
   email: string | null,
+  phone: string | null,
   treeValue: number,
   zipCode: string | null,
   address: string | null,
@@ -48,6 +49,7 @@ async function recordServiceInterest(
       body: JSON.stringify({
         serviceType,
         email,
+        phone,
         treeValue,
         zipCode,
         address,
@@ -213,6 +215,7 @@ function TreeCard({
 // Service Interest CTA Component
 function ServiceInterestCTA({
   email,
+  phone,
   treeValue,
   zipCode,
   address,
@@ -221,6 +224,7 @@ function ServiceInterestCTA({
   hasHealthIssues,
 }: {
   email: string | null;
+  phone: string | null;
   treeValue: number;
   zipCode: string | null;
   address: string | null;
@@ -236,7 +240,7 @@ function ServiceInterestCTA({
     if (arboristStatus !== "idle") return;
     setArboristStatus("loading");
 
-    const result = await recordServiceInterest("arborist", email, treeValue, zipCode, address, reportId, treeCount, hasHealthIssues);
+    const result = await recordServiceInterest("arborist", email, phone, treeValue, zipCode, address, reportId, treeCount, hasHealthIssues);
     setArboristStatus("success");
     setMessage(result.message);
   };
@@ -245,7 +249,7 @@ function ServiceInterestCTA({
     if (quoteStatus !== "idle") return;
     setQuoteStatus("loading");
 
-    const result = await recordServiceInterest("tree_care_quote", email, treeValue, zipCode, address, reportId, treeCount, hasHealthIssues);
+    const result = await recordServiceInterest("tree_care_quote", email, phone, treeValue, zipCode, address, reportId, treeCount, hasHealthIssues);
     setQuoteStatus("success");
     setMessage(result.message);
   };
@@ -688,6 +692,7 @@ export default function ResultsPage() {
         {/* CTA Section */}
         <ServiceInterestCTA
           email={data.email}
+          phone={data.phone}
           treeValue={totals.structuralValue}
           zipCode={data.zipCode}
           address={data.address}
