@@ -309,6 +309,12 @@ export default function Home() {
               &copy; {new Date().getFullYear()} Arbor Value. All rights reserved.
             </p>
           </div>
+          <div className="mt-6 pt-6 border-t border-charcoal-700 flex flex-col md:flex-row items-center justify-center gap-4 text-xs text-charcoal-400">
+            <span>Also from our team:</span>
+            <a href="https://www.haveaidoit.com" className="hover:text-white transition-colors" target="_blank" rel="noopener noreferrer">Have AI Do It - AI Guides</a>
+            <span className="hidden md:inline">·</span>
+            <a href="https://grantfound.com" className="hover:text-white transition-colors" target="_blank" rel="noopener noreferrer">GrantFound - Nonprofit Donor Intelligence</a>
+          </div>
         </div>
       </footer>
     </div>
