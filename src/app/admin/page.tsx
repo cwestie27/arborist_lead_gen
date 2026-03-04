@@ -169,6 +169,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [filter, setFilter] = useState<"all" | "arborist" | "tree_care_quote">("all");
+  const [activeTab, setActiveTab] = useState<"leads" | "calculations">("leads");
   const [days, setDays] = useState(30);
 
   useEffect(() => {
@@ -313,12 +314,29 @@ export default function AdminDashboard() {
           </section>
         )}
 
-        {/* Leads Table */}
+        {/* Tab Switcher */}
         <section>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-medium text-charcoal-500 uppercase tracking-wider">Leads & Reports</h2>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setActiveTab("leads")}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  activeTab === "leads" ? "bg-forest-600 text-white" : "bg-white text-charcoal-600 hover:bg-charcoal-50 border border-charcoal-200"
+                }`}
+              >
+                Leads ({leads.length})
+              </button>
+              <button
+                onClick={() => setActiveTab("calculations")}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  activeTab === "calculations" ? "bg-forest-600 text-white" : "bg-white text-charcoal-600 hover:bg-charcoal-50 border border-charcoal-200"
+                }`}
+              >
+                All Calculations ({reports.length})
+              </button>
+            </div>
             <div className="flex gap-1">
-              {(["all", "arborist", "tree_care_quote"] as const).map(f => (
+              {activeTab === "leads" && (["all", "arborist", "tree_care_quote"] as const).map(f => (
                 <button
                   key={f}
                   onClick={() => setFilter(f)}
@@ -332,6 +350,111 @@ export default function AdminDashboard() {
             </div>
           </div>
 
+          {activeTab === "calculations" ? (
+            <Card>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-charcoal-50 border-b border-charcoal-200">
+                    <tr>
+                      <th className="w-8 px-3 py-3"></th>
+                      <th className="text-left px-3 py-3 text-xs font-medium text-charcoal-600">Date</th>
+                      <th className="text-left px-3 py-3 text-xs font-medium text-charcoal-600">Email</th>
+                      <th className="text-left px-3 py-3 text-xs font-medium text-charcoal-600">Location</th>
+                      <th className="text-left px-3 py-3 text-xs font-medium text-charcoal-600">Trees</th>
+                      <th className="text-left px-3 py-3 text-xs font-medium text-charcoal-600">Total Value</th>
+                      <th className="text-left px-3 py-3 text-xs font-medium text-charcoal-600">CTA Clicked?</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-charcoal-100">
+                    {reports.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} className="px-4 py-12 text-center text-charcoal-500">
+                          No calculations yet.
+                        </td>
+                      </tr>
+                    ) : (
+                      reports.map((report, idx) => {
+                        const trees = report.property_valuation?.trees || [];
+                        const isExpanded = expandedRows.has(`report-${idx}`);
+                        const hasLead = leads.some(l => l.email === report.email);
+                        return (
+                          <Fragment key={idx}>
+                            <tr
+                              className="hover:bg-charcoal-50 cursor-pointer"
+                              onClick={() => trees.length > 0 && toggleRow(`report-${idx}`)}
+                            >
+                              <td className="px-3 py-3 text-charcoal-400">
+                                {trees.length > 0 && (
+                                  isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />
+                                )}
+                              </td>
+                              <td className="px-3 py-3 text-sm text-charcoal-600">
+                                {new Date(report.created_at).toLocaleDateString()}
+                                <br />
+                                <span className="text-xs text-charcoal-400">
+                                  {new Date(report.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                                </span>
+                              </td>
+                              <td className="px-3 py-3">
+                                {report.email ? (
+                                  <span className="flex items-center gap-1.5 text-sm text-forest-600">
+                                    <Mail className="w-3.5 h-3.5" />
+                                    {report.email}
+                                  </span>
+                                ) : (
+                                  <span className="text-sm text-charcoal-400">No email</span>
+                                )}
+                              </td>
+                              <td className="px-3 py-3">
+                                <div className="flex items-start gap-1.5 text-sm">
+                                  <MapPin className="w-3.5 h-3.5 text-charcoal-400 mt-0.5" />
+                                  <div>
+                                    {report.property_valuation?.address && <div className="text-charcoal-700 text-xs">{report.property_valuation.address}</div>}
+                                    <div className="text-charcoal-500">{report.zip_code || report.property_valuation?.zipCode || "—"}</div>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="px-3 py-3">
+                                <div className="flex items-center gap-1 text-sm">
+                                  <TreeDeciduous className="w-3.5 h-3.5 text-forest-500" />
+                                  <span>{report.property_valuation?.totals?.treeCount || trees.length || "—"}</span>
+                                </div>
+                              </td>
+                              <td className="px-3 py-3">
+                                <span className="text-sm font-mono font-medium text-forest-700">
+                                  {report.property_valuation?.totals?.structuralValue
+                                    ? formatCurrency(report.property_valuation.totals.structuralValue)
+                                    : "—"}
+                                </span>
+                              </td>
+                              <td className="px-3 py-3">
+                                {hasLead ? (
+                                  <span className="inline-flex px-2 py-0.5 rounded bg-green-100 text-green-700 text-xs font-medium">Yes</span>
+                                ) : (
+                                  <span className="inline-flex px-2 py-0.5 rounded bg-charcoal-100 text-charcoal-500 text-xs font-medium">No</span>
+                                )}
+                              </td>
+                            </tr>
+                            {isExpanded && trees.length > 0 && (
+                              <tr>
+                                <td colSpan={7} className="px-6 py-3 bg-charcoal-50/50">
+                                  <div className="space-y-2">
+                                    {trees.map((tree: TreeInput, i: number) => (
+                                      <TreeDetail key={i} tree={tree} index={i} />
+                                    ))}
+                                  </div>
+                                </td>
+                              </tr>
+                            )}
+                          </Fragment>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          ) : (
           <Card>
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -448,6 +571,7 @@ export default function AdminDashboard() {
               </table>
             </div>
           </Card>
+          )}
         </section>
       </main>
     </div>
