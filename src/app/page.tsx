@@ -201,6 +201,45 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Browse by Tree Species */}
+      <section className="py-20 md:py-28 bg-white border-t border-charcoal-100">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="font-heading text-3xl md:text-4xl font-semibold text-charcoal-900 mb-4">
+              Calculate Value by Tree Species
+            </h2>
+            <p className="text-lg text-charcoal-600 max-w-2xl mx-auto">
+              Different species have very different values. Select your tree type for a species-specific valuation.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            {[
+              { name: "Black Walnut", href: "/black-walnut-tree-value-calculator", emoji: "🌰", note: "Highest timber value" },
+              { name: "Oak", href: "/oak-tree-value-calculator", emoji: "🌳", note: "Most common hardwood" },
+              { name: "Live Oak", href: "/live-oak-tree-value-calculator", emoji: "🌿", note: "Southern staple" },
+              { name: "Maple", href: "/maple-tree-value-calculator", emoji: "🍁", note: "High landscape value" },
+              { name: "Pecan", href: "/pecan-tree-value-calculator", emoji: "🥜", note: "Nut + timber value" },
+              { name: "Cedar", href: "/cedar-tree-value-calculator", emoji: "🌲", note: "Aromatic hardwood" },
+              { name: "Cypress", href: "/cypress-tree-value-calculator", emoji: "🌾", note: "Rot-resistant wood" },
+              { name: "Fruit Trees", href: "/fruit-tree-value-calculator", emoji: "🍎", note: "Apple, pear, cherry" },
+            ].map((tree) => (
+              <Link key={tree.href} href={tree.href}>
+                <div className="group bg-cream hover:bg-forest-50 border border-charcoal-100 hover:border-forest-300 rounded-2xl p-5 text-center transition-all cursor-pointer">
+                  <div className="text-3xl mb-3">{tree.emoji}</div>
+                  <h3 className="font-heading font-semibold text-charcoal-900 mb-1 group-hover:text-forest-700 transition-colors">
+                    {tree.name}
+                  </h3>
+                  <p className="text-xs text-charcoal-500">{tree.note}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+          <div className="text-center mt-8">
+            <p className="text-charcoal-500 text-sm">Don&apos;t see your species? <Link href="/calculator" className="text-forest-700 underline hover:text-forest-900">Use the general calculator →</Link></p>
+          </div>
+        </div>
+      </section>
+
       {/* How It Works */}
       <section id="how-it-works" className="py-20 md:py-28 bg-forest-50 scroll-mt-16">
         <div className="max-w-6xl mx-auto px-6">
