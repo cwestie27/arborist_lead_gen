@@ -30,12 +30,28 @@ interface AnalyticsData {
   };
 }
 
+interface PhotoUploadData {
+  id: string;
+  base64: string;
+  mimeType: string;
+  fileName?: string;
+}
+
 interface TreeInput {
   species?: string;
   height?: string;
   girth?: string;
   healthCondition?: string;
+  identificationPhotos?: PhotoUploadData[];
+  healthPhotos?: PhotoUploadData[];
+  identificationResult?: {
+    commonName?: string;
+    scientificName?: string;
+    probability?: number;
+  };
   healthAssessment?: {
+    isHealthy?: boolean;
+    healthProbability?: number;
     diseases?: Array<{ name: string; probability: number }>;
   };
   valuation?: {
@@ -121,16 +137,54 @@ function FunnelBar({ label, value, max }: { label: string; value: number; max: n
   );
 }
 
-function TreeDetail({ tree, index }: { tree: TreeInput; index: number }) {
+function MethodBadge({ usedAI, label }: { usedAI: boolean; label: string }) {
   return (
-    <div className="bg-forest-50 rounded-lg p-3 text-sm">
-      <div className="flex items-center gap-2 mb-2">
+    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${
+      usedAI ? "bg-violet-100 text-violet-700" : "bg-charcoal-100 text-charcoal-600"
+    }`}>
+      {usedAI ? "📷 AI" : "✋ Manual"} {label}
+    </span>
+  );
+}
+
+function TreeDetail({ tree, index }: { tree: TreeInput; index: number }) {
+  const usedPhotoForSpecies = !!(tree.identificationResult || (tree.identificationPhotos && tree.identificationPhotos.length > 0));
+  const usedPhotoForHealth = !!(tree.healthAssessment || (tree.healthPhotos && tree.healthPhotos.length > 0));
+
+  // Collect all photos (id photos + health photos, deduplicated by id)
+  const allPhotos: PhotoUploadData[] = [];
+  const seenIds = new Set<string>();
+  for (const p of [...(tree.identificationPhotos || []), ...(tree.healthPhotos || [])]) {
+    if (!seenIds.has(p.id)) {
+      seenIds.add(p.id);
+      allPhotos.push(p);
+    }
+  }
+
+  return (
+    <div className="bg-forest-50 rounded-lg p-3 text-sm space-y-3">
+      <div className="flex items-center gap-2">
         <Leaf className="w-4 h-4 text-forest-600" />
         <span className="font-medium text-charcoal-800">Tree {index + 1}</span>
       </div>
+
+      {/* Method badges */}
+      <div className="flex flex-wrap gap-2">
+        <MethodBadge usedAI={usedPhotoForSpecies} label="Species ID" />
+        <MethodBadge usedAI={usedPhotoForHealth} label="Health" />
+      </div>
+
+      {/* Tree attributes */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
         {tree.species && (
           <div><span className="text-charcoal-500">Species:</span> <span className="capitalize">{tree.species.replace(/_/g, " ")}</span></div>
+        )}
+        {tree.identificationResult?.commonName && (
+          <div><span className="text-charcoal-500">Identified as:</span> <span>{tree.identificationResult.commonName}</span>
+            {tree.identificationResult.probability != null && (
+              <span className="text-charcoal-400 ml-1">({Math.round(tree.identificationResult.probability * 100)}%)</span>
+            )}
+          </div>
         )}
         {tree.height && (
           <div><span className="text-charcoal-500">Height:</span> <span className="capitalize">{tree.height.replace(/_/g, " ")}</span></div>
@@ -148,14 +202,49 @@ function TreeDetail({ tree, index }: { tree: TreeInput; index: number }) {
           <div><span className="text-charcoal-500">Eco/yr:</span> <span className="font-mono">{formatCurrency(tree.valuation.ecoValue.total)}</span></div>
         )}
       </div>
+
+      {/* Disease flags */}
       {tree.healthAssessment?.diseases && tree.healthAssessment.diseases.length > 0 && (
-        <div className="mt-2 text-xs">
+        <div className="text-xs">
           <span className="text-charcoal-500">Issues detected:</span>
           {tree.healthAssessment.diseases.filter(d => d.probability > 0.3).map((d, i) => (
             <span key={i} className="ml-1 inline-flex px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">
               {d.name} ({Math.round(d.probability * 100)}%)
             </span>
           ))}
+        </div>
+      )}
+
+      {/* Photo thumbnails */}
+      {allPhotos.length > 0 && (
+        <div>
+          <p className="text-xs text-charcoal-500 mb-2">
+            Uploaded photo{allPhotos.length > 1 ? "s" : ""}
+            {tree.identificationPhotos && tree.identificationPhotos.length > 0 && tree.healthPhotos && tree.healthPhotos.length > 0
+              ? ` (${tree.identificationPhotos.length} species, ${tree.healthPhotos.length} health)`
+              : ""}:
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {allPhotos.map((photo, i) => {
+              const isIdPhoto = tree.identificationPhotos?.some(p => p.id === photo.id);
+              const isHealthPhoto = tree.healthPhotos?.some(p => p.id === photo.id);
+              const label = isIdPhoto && isHealthPhoto ? "Species & Health" : isIdPhoto ? "Species" : "Health";
+              return (
+                <div key={i} className="relative group">
+                  <a href={`data:${photo.mimeType};base64,${photo.base64}`} target="_blank" rel="noopener noreferrer">
+                    <img
+                      src={`data:${photo.mimeType};base64,${photo.base64}`}
+                      alt={`Tree ${index + 1} photo ${i + 1}`}
+                      className="w-24 h-24 object-cover rounded-lg border border-charcoal-200 hover:opacity-90 transition-opacity cursor-pointer"
+                    />
+                  </a>
+                  <span className="absolute bottom-1 left-1 right-1 text-center text-[10px] bg-black/60 text-white rounded px-1 py-0.5 leading-tight">
+                    {label}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>
