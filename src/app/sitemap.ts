@@ -116,6 +116,38 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
 
+    // Atlanta city pages
+    {
+      url: `${baseUrl}/tree-appraisal-atlanta`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/tree-value-calculator-atlanta`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/atlanta-tree-removal-cost`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/tree-damage-claim-atlanta`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/certified-arborist-atlanta`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+
     // Other content
     {
       url: `${baseUrl}/best-tree-value-calculator-apps`,
