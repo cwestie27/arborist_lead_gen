@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -137,6 +137,29 @@ function FunnelBar({ label, value, max }: { label: string; value: number; max: n
   );
 }
 
+function PhotoLightbox({ src, mimeType, onClose }: { src: string; mimeType: string; onClose: () => void }) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+      onClick={onClose}
+    >
+      <div className="relative max-w-3xl max-h-full" onClick={e => e.stopPropagation()}>
+        <img
+          src={`data:${mimeType};base64,${src}`}
+          alt="Tree photo enlarged"
+          className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+        />
+        <button
+          onClick={onClose}
+          className="absolute -top-3 -right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg text-charcoal-700 hover:bg-charcoal-100 text-lg font-bold"
+        >
+          ×
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function MethodBadge({ usedAI, label }: { usedAI: boolean; label: string }) {
   return (
     <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${
@@ -148,6 +171,8 @@ function MethodBadge({ usedAI, label }: { usedAI: boolean; label: string }) {
 }
 
 function TreeDetail({ tree, index }: { tree: TreeInput; index: number }) {
+  const [lightbox, setLightbox] = useState<{ base64: string; mimeType: string } | null>(null);
+
   const usedPhotoForSpecies = !!(tree.identificationResult || (tree.identificationPhotos && tree.identificationPhotos.length > 0));
   const usedPhotoForHealth = !!(tree.healthAssessment || (tree.healthPhotos && tree.healthPhotos.length > 0));
 
@@ -162,6 +187,14 @@ function TreeDetail({ tree, index }: { tree: TreeInput; index: number }) {
   }
 
   return (
+    <>
+    {lightbox && (
+      <PhotoLightbox
+        src={lightbox.base64}
+        mimeType={lightbox.mimeType}
+        onClose={() => setLightbox(null)}
+      />
+    )}
     <div className="bg-forest-50 rounded-lg p-3 text-sm space-y-3">
       <div className="flex items-center gap-2">
         <Leaf className="w-4 h-4 text-forest-600" />
@@ -231,13 +264,13 @@ function TreeDetail({ tree, index }: { tree: TreeInput; index: number }) {
               const label = isIdPhoto && isHealthPhoto ? "Species & Health" : isIdPhoto ? "Species" : "Health";
               return (
                 <div key={i} className="relative group">
-                  <a href={`data:${photo.mimeType};base64,${photo.base64}`} target="_blank" rel="noopener noreferrer">
+                  <button onClick={() => setLightbox({ base64: photo.base64, mimeType: photo.mimeType })}>
                     <img
                       src={`data:${photo.mimeType};base64,${photo.base64}`}
                       alt={`Tree ${index + 1} photo ${i + 1}`}
                       className="w-24 h-24 object-cover rounded-lg border border-charcoal-200 hover:opacity-90 transition-opacity cursor-pointer"
                     />
-                  </a>
+                  </button>
                   <span className="absolute bottom-1 left-1 right-1 text-center text-[10px] bg-black/60 text-white rounded px-1 py-0.5 leading-tight">
                     {label}
                   </span>
@@ -248,6 +281,7 @@ function TreeDetail({ tree, index }: { tree: TreeInput; index: number }) {
         </div>
       )}
     </div>
+    </>
   );
 }
 
