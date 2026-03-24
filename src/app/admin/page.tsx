@@ -285,6 +285,20 @@ function TreeDetail({ tree, index }: { tree: TreeInput; index: number }) {
   );
 }
 
+async function lookupZip(zip: string): Promise<string> {
+  if (!zip || !/^\d{5}$/.test(zip)) return "";
+  try {
+    const res = await fetch(`https://api.zippopotam.us/us/${zip}`);
+    if (!res.ok) return "";
+    const data = await res.json();
+    const place = data.places?.[0];
+    if (!place) return "";
+    return `${place["place name"]}, ${place["state abbreviation"]}`;
+  } catch {
+    return "";
+  }
+}
+
 export default function AdminDashboard() {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [reports, setReports] = useState<ReportRow[]>([]);
@@ -294,6 +308,7 @@ export default function AdminDashboard() {
   const [filter, setFilter] = useState<"all" | "arborist" | "tree_care_quote">("all");
   const [activeTab, setActiveTab] = useState<"leads" | "calculations">("leads");
   const [days, setDays] = useState(30);
+  const [zipCache, setZipCache] = useState<Map<string, string>>(new Map());
 
   useEffect(() => {
     setLoading(true);
@@ -315,6 +330,26 @@ export default function AdminDashboard() {
       setLoading(false);
     });
   }, [days]);
+
+  // Resolve all unique zip codes → city, state
+  useEffect(() => {
+    const zips = new Set<string>();
+    leads.forEach(l => { if (l.zip_code) zips.add(l.zip_code); });
+    reports.forEach(r => {
+      const z = r.zip_code || (r.property_valuation?.zipCode as string | undefined);
+      if (z) zips.add(z);
+    });
+    const missing = [...zips].filter(z => !zipCache.has(z));
+    if (missing.length === 0) return;
+    Promise.all(missing.map(z => lookupZip(z).then(city => ({ z, city })))).then(results => {
+      setZipCache(prev => {
+        const next = new Map(prev);
+        results.forEach(({ z, city }) => next.set(z, city));
+        return next;
+      });
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [leads, reports]);
 
   const toggleRow = (id: string) => {
     const next = new Set(expandedRows);
@@ -532,8 +567,13 @@ export default function AdminDashboard() {
                                 <div className="flex items-start gap-1.5 text-sm">
                                   <MapPin className="w-3.5 h-3.5 text-charcoal-400 mt-0.5" />
                                   <div>
-                                    {report.property_valuation?.address && <div className="text-charcoal-700 text-xs">{report.property_valuation.address}</div>}
-                                    <div className="text-charcoal-500">{report.zip_code || report.property_valuation?.zipCode || "—"}</div>
+                                    {report.property_valuation?.address && <div className="text-charcoal-700 text-xs">{report.property_valuation.address as string}</div>}
+                                    <div className="text-charcoal-500">{report.zip_code || (report.property_valuation?.zipCode as string | undefined) || "—"}</div>
+                                    {(() => {
+                                      const z = report.zip_code || (report.property_valuation?.zipCode as string | undefined);
+                                      const city = z ? zipCache.get(z) : undefined;
+                                      return city ? <div className="text-xs text-charcoal-400">{city}</div> : null;
+                                    })()}
                                   </div>
                                 </div>
                               </td>
@@ -640,6 +680,9 @@ export default function AdminDashboard() {
                                 <div>
                                   {lead.address && <div className="text-charcoal-700 text-xs">{lead.address}</div>}
                                   <div className="text-charcoal-500">{lead.zip_code || "—"}</div>
+                                  {lead.zip_code && zipCache.get(lead.zip_code) && (
+                                    <div className="text-xs text-charcoal-400">{zipCache.get(lead.zip_code)}</div>
+                                  )}
                                 </div>
                               </div>
                             </td>
